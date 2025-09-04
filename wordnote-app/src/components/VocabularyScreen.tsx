@@ -963,13 +963,23 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
           </CollapsibleContent>
         </Collapsible>
 
-        {/* Bulk Actions */}
-        {selectedItems.length > 0 && (
-          <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-blue-700">
-                Đã chọn {selectedItems.length} từ
+
+        {/* Vocabulary List - Full Height */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  checked={selectAll}
+                  onCheckedChange={toggleSelectAll}
+                />
+                <span className="text-sm">Chọn tất cả</span>
+              </div>
+              <span className="text-sm text-muted-foreground">
+                Đã chọn {selectedItems.length}/{getFilteredAndSortedList().length} từ
               </span>
+            </div>
+            {selectedItems.length > 0 && (
               <div className="flex space-x-2">
                 <Dialog open={showMoveCategoryDialog} onOpenChange={setShowMoveCategoryDialog}>
                   <DialogTrigger asChild>
@@ -1006,31 +1016,7 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
                   Xóa
                 </Button>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Vocabulary List - Full Height */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  checked={selectAll}
-                  onCheckedChange={toggleSelectAll}
-                />
-                <span className="text-sm">Chọn tất cả</span>
-              </div>
-              <span className="text-sm text-muted-foreground">
-                Hiển thị {getFilteredAndSortedList().length} từ
-              </span>
-            </div>
-            <div className="flex space-x-2">
-              <Button variant="outline" size="sm">
-                <Eye className="h-4 w-4 mr-2" />
-                Xem chi tiết
-              </Button>
-            </div>
+            )}
           </div>
 
           {/* Vocabulary Cards */}
