@@ -5,10 +5,11 @@ import { Badge } from './ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Checkbox } from './ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Play, Pause, Volume2, Settings, Eye, EyeOff, ChevronLeft, ChevronRight, BookOpen, Heart, Users } from 'lucide-react';
+import { Play, Pause, Volume2, Settings, Eye, EyeOff, ChevronLeft, ChevronRight, BookOpen, Heart, Users, Search } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Progress } from './ui/progress';
 import { Slider } from './ui/slider';
+import { DictionarySearchPopup } from './DictionarySearchPopup';
 
 interface StoryScreenProps {
   onBack: () => void;
@@ -73,6 +74,9 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
   // Filters
   const [filterTopic, setFilterTopic] = useState('all');
   const [filterDifficulty, setFilterDifficulty] = useState('all');
+
+  // Dictionary popup state
+  const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
 
   // Mock video data
   const [videoStories, setVideoStories] = useState<VideoStory[]>([
@@ -393,6 +397,14 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
       case 'Daily': return 'bg-blue-100 text-blue-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  // Handle saving word from dictionary popup
+  const handleSaveWordFromDictionary = (word: string, meaning: string, pronunciation: string, category: string) => {
+    // For StoryScreen, we can add the word to a vocabulary list or show a notification
+    // Since StoryScreen doesn't have a vocabulary list, we'll just show a success message
+    console.log('Word saved from dictionary:', { word, meaning, pronunciation, category });
+    setShowDictionaryPopup(false);
   };
 
   const renderVideoCard = (video: VideoStory) => (
@@ -743,24 +755,37 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-red-600 text-white p-6">
-        <div className="flex items-center space-x-3">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onBack}
-            className="text-white hover:bg-white/20 p-2"
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onBack}
+              className="text-white hover:bg-white/20 p-2"
+            >
+              ←
+            </Button>
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <span className="text-xl">📺</span>
+            </div>
+            <div>
+              <h1 className="text-xl">Story - Học từ qua video</h1>
+              <p className="text-red-100 text-sm">
+                {getFilteredVideos().length} video • {selectedVideos.length} đã chọn • {favoriteVideos.length} yêu thích
+              </p>
+            </div>
+          </div>
+          
+          {/* Dictionary Search Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowDictionaryPopup(true)}
+            className="text-white hover:bg-white/20"
+            title="Tra từ điển"
           >
-            ←
+            <BookOpen className="h-5 w-5" />
           </Button>
-          <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-            <span className="text-xl">📺</span>
-          </div>
-          <div>
-            <h1 className="text-xl">Story - Học từ qua video</h1>
-            <p className="text-red-100 text-sm">
-              {getFilteredVideos().length} video • {selectedVideos.length} đã chọn • {favoriteVideos.length} yêu thích
-            </p>
-          </div>
         </div>
       </div>
 
@@ -897,6 +922,14 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Dictionary Search Popup */}
+      <DictionarySearchPopup
+        isOpen={showDictionaryPopup}
+        onClose={() => setShowDictionaryPopup(false)}
+        onSaveWord={handleSaveWordFromDictionary}
+        categories={['Harry Potter', 'TOEIC', 'Daily']}
+      />
     </div>
   );
 }

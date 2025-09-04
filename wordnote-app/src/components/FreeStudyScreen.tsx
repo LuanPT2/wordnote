@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { BookOpen, Image as ImageIcon, Volume2, Plus, Star, ChevronRight, Filter } from 'lucide-react';
+import { BookOpen, Image as ImageIcon, Volume2, Plus, Star, ChevronRight, Filter, Search } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Progress } from './ui/progress';
+import { DictionarySearchPopup } from './DictionarySearchPopup';
 
 interface FreeStudyScreenProps {
   onBack: () => void;
@@ -51,6 +52,9 @@ export function FreeStudyScreen({ onBack }: FreeStudyScreenProps) {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterDifficulty, setFilterDifficulty] = useState('all');
+
+  // Dictionary popup state
+  const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
 
   // Mock study data
   const studyTopics: StudyTopic[] = [
@@ -291,6 +295,14 @@ export function FreeStudyScreen({ onBack }: FreeStudyScreenProps) {
       case 'Career': return 'bg-purple-100 text-purple-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  // Handle saving word from dictionary popup
+  const handleSaveWordFromDictionary = (word: string, meaning: string, pronunciation: string, category: string) => {
+    // For FreeStudyScreen, we can add the word to a vocabulary list or show a notification
+    // Since FreeStudyScreen doesn't have a vocabulary list, we'll just show a success message
+    console.log('Word saved from dictionary:', { word, meaning, pronunciation, category });
+    setShowDictionaryPopup(false);
   };
 
   // Sub-topic learning view
@@ -590,24 +602,37 @@ export function FreeStudyScreen({ onBack }: FreeStudyScreenProps) {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-orange-600 text-white p-6">
-        <div className="flex items-center space-x-3">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onBack}
-            className="text-white hover:bg-white/20 p-2"
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onBack}
+              className="text-white hover:bg-white/20 p-2"
+            >
+              ←
+            </Button>
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <span className="text-xl">📚</span>
+            </div>
+            <div>
+              <h1 className="text-xl">Học tự do</h1>
+              <p className="text-orange-100 text-sm">
+                {getFilteredTopics().length} chủ đề • Học theo sở thích
+              </p>
+            </div>
+          </div>
+          
+          {/* Dictionary Search Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowDictionaryPopup(true)}
+            className="text-white hover:bg-white/20"
+            title="Tra từ điển"
           >
-            ←
+            <BookOpen className="h-5 w-5" />
           </Button>
-          <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-            <span className="text-xl">📚</span>
-          </div>
-          <div>
-            <h1 className="text-xl">Học tự do</h1>
-            <p className="text-orange-100 text-sm">
-              {getFilteredTopics().length} chủ đề • Học theo sở thích
-            </p>
-          </div>
         </div>
       </div>
 
@@ -727,6 +752,14 @@ export function FreeStudyScreen({ onBack }: FreeStudyScreenProps) {
           </Card>
         )}
       </div>
+
+      {/* Dictionary Search Popup */}
+      <DictionarySearchPopup
+        isOpen={showDictionaryPopup}
+        onClose={() => setShowDictionaryPopup(false)}
+        onSaveWord={handleSaveWordFromDictionary}
+        categories={['Nature', 'Food', 'Transportation', 'Career']}
+      />
     </div>
   );
 }

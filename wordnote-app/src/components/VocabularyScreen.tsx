@@ -5,13 +5,14 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Plus, X, Filter, Search, Eye, EyeOff, Edit, Trash2, MoreVertical, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, X, Filter, Search, Eye, EyeOff, Edit, Trash2, MoreVertical, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Checkbox } from './ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { CategoryTopicSelector } from './CategoryTopicSelector';
+import { DictionarySearchPopup } from './DictionarySearchPopup';
 
 interface VocabularyScreenProps {
   onBack: () => void;
@@ -95,6 +96,9 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
 
   // Edit mode
   const [editingItem, setEditingItem] = useState<VocabularyItem | null>(null);
+
+  // Dictionary popup state
+  const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
 
   const [vocabularyList, setVocabularyList] = useState<VocabularyItem[]>([
     {
@@ -468,6 +472,26 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
     }
   };
 
+  // Handle saving word from dictionary popup
+  const handleSaveWordFromDictionary = (word: string, meaning: string, pronunciation: string, category: string) => {
+    const newVocabularyItem: VocabularyItem = {
+      id: Date.now().toString(),
+      word,
+      pronunciation,
+      meaning,
+      examples: [],
+      category,
+      topic: 'general',
+      difficulty: 'medium',
+      dateAdded: new Date().toISOString().split('T')[0],
+      mastered: false,
+      reviewCount: 0
+    };
+    
+    setVocabularyList(prev => [newVocabularyItem, ...prev]);
+    setShowDictionaryPopup(false);
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
@@ -493,8 +517,20 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
             </div>
           </div>
           
-          {/* Search Icon */}
-          <div className="relative">
+          {/* Search and Dictionary Icons */}
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowDictionaryPopup(true)}
+              className="text-white hover:bg-white/20"
+              title="Tra từ điển"
+            >
+              <BookOpen className="h-5 w-5" />
+            </Button>
+            
+            {/* Local Search */}
+            <div className="relative">
             <Button
               variant="ghost"
               size="sm"
@@ -517,6 +553,7 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
                 />
               </div>
             )}
+            </div>
           </div>
         </div>
       </div>
@@ -1125,6 +1162,14 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
           )}
         </div>
       </div>
+
+      {/* Dictionary Search Popup */}
+      <DictionarySearchPopup
+        isOpen={showDictionaryPopup}
+        onClose={() => setShowDictionaryPopup(false)}
+        onSaveWord={handleSaveWordFromDictionary}
+        categories={categories}
+      />
     </div>
   );
 }

@@ -7,11 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Checkbox } from './ui/checkbox';
 import { Progress } from './ui/progress';
-import { ChevronLeft, ChevronRight, Play, Pause, Settings, Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, Pause, Settings, Eye, EyeOff, ChevronDown, ChevronUp, BookOpen, Search } from 'lucide-react';
 import { Slider } from './ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { CategoryTopicSelector } from './CategoryTopicSelector';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { DictionarySearchPopup } from './DictionarySearchPopup';
 
 interface PracticeScreenProps {
   onBack: () => void;
@@ -79,6 +80,9 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
   // MyNote states
   const [myNotes, setMyNotes] = useState<VocabularyItem[]>([]);
   const [currentNoteIndex, setCurrentNoteIndex] = useState(0);
+
+  // Dictionary popup state
+  const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
 
   // Mock vocabulary data
   const vocabularyList: VocabularyItem[] = [
@@ -289,33 +293,66 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
     }
   };
 
+  // Handle saving word from dictionary popup
+  const handleSaveWordFromDictionary = (word: string, meaning: string, pronunciation: string, category: string) => {
+    const newVocabularyItem: VocabularyItem = {
+      id: Date.now().toString(),
+      word,
+      pronunciation,
+      meaning,
+      examples: [],
+      category,
+      topic: 'general',
+      difficulty: 'medium',
+      mastered: false,
+      reviewCount: 0
+    };
+    
+    // Add to vocabulary list (in a real app, this would be saved to backend)
+    console.log('Word saved from dictionary:', newVocabularyItem);
+    setShowDictionaryPopup(false);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-green-600 text-white p-6">
-        <div className="flex items-center space-x-3">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onBack}
-            className="text-white hover:bg-white/20 p-2"
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onBack}
+              className="text-white hover:bg-white/20 p-2"
+            >
+              ←
+            </Button>
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <span className="text-xl">🎯</span>
+            </div>
+            <div>
+              <h1 className="text-xl">Luyện tập</h1>
+              <p className="text-green-100 text-sm">
+                {activeTab === 'practice' && selectedWords.length > 0 
+                  ? `${currentIndex + 1}/${selectedWords.length} • ${Math.round((practiceResults.correct / Math.max(practiceResults.total, 1)) * 100)}% đúng`
+                  : activeTab === 'mynote'
+                  ? `${myNotes.length} ghi chú`
+                  : `${getFilteredWords().length} từ phù hợp`
+                }
+              </p>
+            </div>
+          </div>
+          
+          {/* Dictionary Search Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowDictionaryPopup(true)}
+            className="text-white hover:bg-white/20"
+            title="Tra từ điển"
           >
-            ←
+            <BookOpen className="h-5 w-5" />
           </Button>
-          <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-            <span className="text-xl">🎯</span>
-          </div>
-          <div>
-            <h1 className="text-xl">Luyện tập</h1>
-            <p className="text-green-100 text-sm">
-              {activeTab === 'practice' && selectedWords.length > 0 
-                ? `${currentIndex + 1}/${selectedWords.length} • ${Math.round((practiceResults.correct / Math.max(practiceResults.total, 1)) * 100)}% đúng`
-                : activeTab === 'mynote'
-                ? `${myNotes.length} ghi chú`
-                : `${getFilteredWords().length} từ phù hợp`
-              }
-            </p>
-          </div>
         </div>
       </div>
 
@@ -814,6 +851,14 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
 
         </Tabs>
       </div>
+
+      {/* Dictionary Search Popup */}
+      <DictionarySearchPopup
+        isOpen={showDictionaryPopup}
+        onClose={() => setShowDictionaryPopup(false)}
+        onSaveWord={handleSaveWordFromDictionary}
+        categories={['Harry Potter', 'Luyện TOEIC', 'Daily', 'New', 'Story']}
+      />
     </div>
   );
 }

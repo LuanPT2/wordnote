@@ -8,10 +8,11 @@ import { Checkbox } from './ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Input } from './ui/input';
-import { Settings, Play, Pause, SkipForward, SkipBack, Volume2, Shuffle, Eye, EyeOff, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { Settings, Play, Pause, SkipForward, SkipBack, Volume2, Shuffle, Eye, EyeOff, ChevronDown, ChevronUp, Trash2, BookOpen, Search } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { CategoryTopicSelector } from './CategoryTopicSelector';
+import { DictionarySearchPopup } from './DictionarySearchPopup';
 
 interface ListeningScreenProps {
   onBack: () => void;
@@ -84,6 +85,9 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
 
   // Saved lists
   const [savedLists, setSavedLists] = useState<SavedWordList[]>([]);
+
+  // Dictionary popup state
+  const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
 
   // Mock vocabulary data
   const vocabularyList: VocabularyItem[] = [
@@ -344,6 +348,25 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
     }
   };
 
+  // Handle saving word from dictionary popup
+  const handleSaveWordFromDictionary = (word: string, meaning: string, pronunciation: string, category: string) => {
+    const newVocabularyItem: VocabularyItem = {
+      id: Date.now().toString(),
+      word,
+      pronunciation,
+      meaning,
+      examples: [],
+      category,
+      topic: 'general',
+      difficulty: 'medium',
+      mastered: false
+    };
+    
+    // Add to vocabulary list (in a real app, this would be saved to backend)
+    console.log('Word saved from dictionary:', newVocabularyItem);
+    setShowDictionaryPopup(false);
+  };
+
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'Harry Potter': return 'bg-red-100 text-red-800';
@@ -381,16 +404,29 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
             </div>
           </div>
           
-          {activeTab === 'listening' && (
+          <div className="flex items-center space-x-2">
+            {/* Dictionary Search Button */}
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsBackgroundMode(!isBackgroundMode)}
+              onClick={() => setShowDictionaryPopup(true)}
               className="text-white hover:bg-white/20"
+              title="Tra từ điển"
             >
-              {isBackgroundMode ? '🔇' : '🎵'} 
+              <BookOpen className="h-5 w-5" />
             </Button>
-          )}
+            
+            {activeTab === 'listening' && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsBackgroundMode(!isBackgroundMode)}
+                className="text-white hover:bg-white/20"
+              >
+                {isBackgroundMode ? '🔇' : '🎵'} 
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -930,6 +966,14 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Dictionary Search Popup */}
+      <DictionarySearchPopup
+        isOpen={showDictionaryPopup}
+        onClose={() => setShowDictionaryPopup(false)}
+        onSaveWord={handleSaveWordFromDictionary}
+        categories={['Harry Potter', 'Luyện TOEIC', 'Daily', 'New', 'Story']}
+      />
     </div>
   );
 }

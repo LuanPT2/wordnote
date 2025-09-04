@@ -5,9 +5,10 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Plus, X, Filter, SortAsc } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { Plus, X, Filter, SortAsc, BookOpen, Search } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { DictionarySearchPopup } from './DictionarySearchPopup';
 
 interface VocabularyNoteScreenProps {
   onBack: () => void;
@@ -66,6 +67,9 @@ export function VocabularyNoteScreen({ onBack }: VocabularyNoteScreenProps) {
 
   // Example management
   const [currentExample, setCurrentExample] = useState({ sentence: '', translation: '' });
+
+  // Dictionary popup state
+  const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
 
   const [vocabularyList, setVocabularyList] = useState<VocabularyItem[]>([
     {
@@ -229,6 +233,26 @@ export function VocabularyNoteScreen({ onBack }: VocabularyNoteScreenProps) {
     }
   };
 
+  // Handle saving word from dictionary popup
+  const handleSaveWordFromDictionary = (word: string, meaning: string, pronunciation: string, category: string) => {
+    const newVocabularyItem: VocabularyItem = {
+      id: Date.now().toString(),
+      word,
+      pronunciation,
+      meaning,
+      examples: [],
+      category,
+      topic: 'general',
+      difficulty: 'medium',
+      dateAdded: new Date().toISOString().split('T')[0],
+      mastered: false,
+      reviewCount: 0
+    };
+    
+    setVocabularyList(prev => [newVocabularyItem, ...prev]);
+    setShowDictionaryPopup(false);
+  };
+
   // Filter and sort logic
   const getFilteredAndSortedList = () => {
     let filtered = vocabularyList.filter(item => {
@@ -277,24 +301,37 @@ export function VocabularyNoteScreen({ onBack }: VocabularyNoteScreenProps) {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-blue-600 text-white p-6">
-        <div className="flex items-center space-x-3">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onBack}
-            className="text-white hover:bg-white/20 p-2"
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onBack}
+              className="text-white hover:bg-white/20 p-2"
+            >
+              ←
+            </Button>
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <span className="text-xl">📝</span>
+            </div>
+            <div>
+              <h1 className="text-xl">Ghi chú từ vựng</h1>
+              <p className="text-blue-100 text-sm">
+                {vocabularyList.length} từ • {vocabularyList.filter(v => v.mastered).length} đã thuộc
+              </p>
+            </div>
+          </div>
+          
+          {/* Dictionary Search Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowDictionaryPopup(true)}
+            className="text-white hover:bg-white/20"
+            title="Tra từ điển"
           >
-            ←
+            <BookOpen className="h-5 w-5" />
           </Button>
-          <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-            <span className="text-xl">📝</span>
-          </div>
-          <div>
-            <h1 className="text-xl">Ghi chú từ vựng</h1>
-            <p className="text-blue-100 text-sm">
-              {vocabularyList.length} từ • {vocabularyList.filter(v => v.mastered).length} đã thuộc
-            </p>
-          </div>
         </div>
       </div>
 
@@ -698,6 +735,14 @@ export function VocabularyNoteScreen({ onBack }: VocabularyNoteScreenProps) {
 
         </Tabs>
       </div>
+
+      {/* Dictionary Search Popup */}
+      <DictionarySearchPopup
+        isOpen={showDictionaryPopup}
+        onClose={() => setShowDictionaryPopup(false)}
+        onSaveWord={handleSaveWordFromDictionary}
+        categories={categories.filter(cat => cat !== 'Tất cả')}
+      />
     </div>
   );
 }
