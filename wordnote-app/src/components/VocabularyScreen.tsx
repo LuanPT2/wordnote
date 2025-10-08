@@ -5,7 +5,7 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Plus, X, Filter, Search, Eye, EyeOff, Edit, Trash2, MoreVertical, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
+import { Plus, X, Filter, Edit, Trash2, MoreVertical, ChevronDown, ChevronUp, BookOpen, Folder } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Checkbox } from './ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
@@ -13,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { CategoryTopicSelector } from './CategoryTopicSelector';
 import { DictionarySearchPopup } from './DictionarySearchPopup';
+import { CategoryManagerModal } from './CategoryManagerModal';
 
 interface VocabularyScreenProps {
   onBack: () => void;
@@ -60,7 +61,6 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
   
   // Filter and search states
   const [searchTerm, setSearchTerm] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
   const [filterCategoryList, setFilterCategoryList] = useState<string[]>([]);
   const [filterTopicList, setFilterTopicList] = useState<string[]>([]);
   const [filterDifficulty, setFilterDifficulty] = useState('all');
@@ -99,6 +99,9 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
 
   // Dictionary popup state
   const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
+  
+  // Category manager modal
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
 
   const [vocabularyList, setVocabularyList] = useState<VocabularyItem[]>([
     {
@@ -529,31 +532,16 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
               <BookOpen className="h-5 w-5" />
             </Button>
             
-            {/* Local Search */}
-            <div className="relative">
+            {/* Category Manager */}
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setShowSearch(!showSearch)}
+              onClick={() => setShowCategoryManager(true)}
               className="text-white hover:bg-white/20"
+              title="Quản lý danh mục"
             >
-              <Search className="h-5 w-5" />
+              <Folder className="h-5 w-5" />
             </Button>
-            {showSearch && (
-              <div className="absolute top-12 right-0 w-64 z-10">
-                <Input
-                  placeholder="Tìm kiếm từ vựng..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onBlur={() => {
-                    if (!searchTerm) setShowSearch(false);
-                  }}
-                  autoFocus
-                  className="bg-white text-black"
-                />
-              </div>
-            )}
-            </div>
           </div>
         </div>
       </div>
@@ -1169,6 +1157,12 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
         onClose={() => setShowDictionaryPopup(false)}
         onSaveWord={handleSaveWordFromDictionary}
         categories={categories}
+      />
+
+      {/* Category Manager Modal */}
+      <CategoryManagerModal
+        isOpen={showCategoryManager}
+        onClose={() => setShowCategoryManager(false)}
       />
     </div>
   );

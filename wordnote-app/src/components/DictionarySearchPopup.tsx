@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
@@ -20,6 +20,7 @@ import {
   Share2
 } from 'lucide-react';
 import { ScrollArea } from './ui/scroll-area';
+import { Separator } from './ui/separator';
 
 interface DictionaryEntry {
   word: string;
@@ -56,6 +57,7 @@ export function DictionarySearchPopup({
   const [selectedCategory, setSelectedCategory] = useState(categories[0] || 'Daily');
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Mock dictionary data
   const mockDictionary: Record<string, DictionaryEntry> = {
@@ -123,19 +125,6 @@ export function DictionarySearchPopup({
       usage: 'Often used in academic or work contexts to describe delaying important tasks',
       relatedWords: ['procrastination', 'procrastinator'],
       level: 'advanced'
-    },
-    'run': {
-      word: 'run',
-      phonetic: '/rʌn/',
-      partOfSpeech: 'verb, noun',
-      definition: 'move at a speed faster than a walk, never having both or all the feet on the ground at the same time',
-      example: 'I like to run in the park every morning.',
-      exampleTranslation: 'Tôi thích chạy bộ trong công viên mỗi sáng.',
-      synonyms: ['jog', 'sprint', 'dash', 'race'],
-      antonyms: ['walk', 'crawl', 'stop'],
-      usage: 'Used to describe rapid movement on foot or managing something',
-      relatedWords: ['runner', 'running', 'rundown', 'runway', 'overrun'],
-      level: 'beginner'
     }
   };
 
@@ -229,6 +218,12 @@ export function DictionarySearchPopup({
   };
 
   useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
     if (searchTerm) {
       const timeoutId = setTimeout(() => {
         handleSearch(searchTerm);
@@ -244,10 +239,8 @@ export function DictionarySearchPopup({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-full max-h-full m-0 p-0 overflow-hidden">
         <DialogHeader className="sr-only">
-          <DialogTitle>Từ điển tìm kiếm</DialogTitle>
-          <DialogDescription>
-            Tra cứu từ vựng tiếng Anh với phiên âm, nghĩa và ví dụ
-          </DialogDescription>
+          <DialogTitle>Từ điển</DialogTitle>
+          <DialogDescription>Tra cứu và lưu từ vựng</DialogDescription>
         </DialogHeader>
         <div className="h-screen flex flex-col">
           {/* Header */}
@@ -276,11 +269,11 @@ export function DictionarySearchPopup({
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input
+                ref={inputRef}
                 placeholder="Nhập từ cần tra cứu..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 h-12 text-lg"
-                autoFocus
               />
             </div>
             

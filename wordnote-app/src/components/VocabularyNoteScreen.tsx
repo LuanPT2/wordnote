@@ -301,27 +301,26 @@ export function VocabularyNoteScreen({ onBack }: VocabularyNoteScreenProps) {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-blue-600 text-white p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onBack}
-              className="text-white hover:bg-white/20 p-2"
-            >
-              ←
-            </Button>
-            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              <span className="text-xl">📝</span>
-            </div>
-            <div>
-              <h1 className="text-xl">Ghi chú từ vựng</h1>
-              <p className="text-blue-100 text-sm">
-                {vocabularyList.length} từ • {vocabularyList.filter(v => v.mastered).length} đã thuộc
-              </p>
-            </div>
+        <div className="flex items-center space-x-3">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onBack}
+            className="text-white hover:bg-white/20 p-2"
+          >
+            ←
+          </Button>
+          <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+            <span className="text-xl">📝</span>
           </div>
-          
+          <div>
+            <h1 className="text-xl">Ghi chú từ vựng</h1>
+            <p className="text-blue-100 text-sm">
+              {vocabularyList.length} từ • {vocabularyList.filter(v => v.mastered).length} đã thuộc
+            </p>
+          </div>
+
+               
           {/* Dictionary Search Button */}
           <Button
             variant="ghost"

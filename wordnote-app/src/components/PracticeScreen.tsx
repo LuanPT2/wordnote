@@ -11,6 +11,7 @@ import { ChevronLeft, ChevronRight, Play, Pause, Settings, Eye, EyeOff, ChevronD
 import { Slider } from './ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { CategoryTopicSelector } from './CategoryTopicSelector';
+import { CategorySelector } from './common/CategorySelector';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { DictionarySearchPopup } from './DictionarySearchPopup';
 
@@ -314,35 +315,38 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-green-600 text-white p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onBack}
-              className="text-white hover:bg-white/20 p-2"
-            >
-              ←
-            </Button>
-            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              <span className="text-xl">🎯</span>
-            </div>
-            <div>
-              <h1 className="text-xl">Luyện tập</h1>
-              <p className="text-green-100 text-sm">
-                {activeTab === 'practice' && selectedWords.length > 0 
-                  ? `${currentIndex + 1}/${selectedWords.length} • ${Math.round((practiceResults.correct / Math.max(practiceResults.total, 1)) * 100)}% đúng`
-                  : activeTab === 'mynote'
-                  ? `${myNotes.length} ghi chú`
-                  : `${getFilteredWords().length} từ phù hợp`
-                }
-              </p>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* Header with gradient */}
+      <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-6 shadow-lg">
+        <div className="flex items-center space-x-4">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onBack}
+            className="text-white hover:bg-white/20 p-2 rounded-lg transition-colors"
+          >
+            ←
+          </Button>
+          <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+            <span className="text-2xl">🎯</span>
           </div>
-          
+          <div className="flex-1">
+            <h1 className="text-2xl font-semibold">Luyện tập từ vựng</h1>
+            <p className="text-green-100 text-sm mt-1 flex items-center space-x-2">
+              {activeTab === 'practice' && selectedWords.length > 0 ? (
+                <>
+                  <span>📖 {currentIndex + 1}/{selectedWords.length}</span>
+                  <span>•</span>
+                  <span>✅ {Math.round((practiceResults.correct / Math.max(practiceResults.total, 1)) * 100)}% đúng</span>
+                </>
+              ) : activeTab === 'mynote' ? (
+                <span>📝 {myNotes.length} ghi chú</span>
+              ) : (
+                <span>📚 {getFilteredWords().length} từ sẵn sàng</span>
+              )}
+            </p>
+          </div>
+
           {/* Dictionary Search Button */}
           <Button
             variant="ghost"
@@ -358,25 +362,35 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
 
 
 
-      <div className="p-6">
+      <div className="p-6 bg-gradient-to-b from-muted/30 to-background min-h-screen">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="config">Cấu hình</TabsTrigger>
-            <TabsTrigger value="practice">Luyện tập</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-white/50 backdrop-blur-sm border shadow-sm">
+            <TabsTrigger value="config" className="flex items-center space-x-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <Settings className="h-4 w-4" />
+              <span>Cấu hình</span>
+            </TabsTrigger>
+            <TabsTrigger value="practice" className="flex items-center space-x-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <span>🎯</span>
+              <span>Luyện tập</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="config" className="space-y-6 mt-6">
             {/* Settings - Collapsible */}
             <Collapsible open={settingsExpanded} onOpenChange={setSettingsExpanded}>
-              <Card>
+              <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
                 <CollapsibleTrigger className="w-full">
-                  <CardHeader className="pb-2">
+                  <CardHeader className="pb-3 hover:bg-muted/20 transition-colors rounded-t-lg">
                     <CardTitle className="flex items-center justify-between text-left">
-                      <div className="flex items-center space-x-2">
-                        <Settings className="h-5 w-5" />
-                        <span>Cài đặt luyện tập</span>
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-blue-100 rounded-lg">
+                          <Settings className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <span className="text-lg">Cài đặt luyện tập</span>
                       </div>
-                      {settingsExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      <div className="p-1 hover:bg-muted rounded-md transition-colors">
+                        {settingsExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      </div>
                     </CardTitle>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -451,12 +465,19 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
 
             {/* Filter Settings - Collapsible */}
             <Collapsible open={filtersExpanded} onOpenChange={setFiltersExpanded}>
-              <Card>
+              <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
                 <CollapsibleTrigger className="w-full">
-                  <CardHeader className="pb-2">
+                  <CardHeader className="pb-3 hover:bg-muted/20 transition-colors rounded-t-lg">
                     <CardTitle className="flex items-center justify-between text-left">
-                      <span>Bộ lọc từ vựng</span>
-                      {filtersExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-purple-100 rounded-lg">
+                          <span className="text-purple-600">🔍</span>
+                        </div>
+                        <span className="text-lg">Bộ lọc từ vựng</span>
+                      </div>
+                      <div className="p-1 hover:bg-muted rounded-md transition-colors">
+                        {filtersExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      </div>
                     </CardTitle>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -465,11 +486,13 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm mb-2">Danh mục ({config.categories.length} đã chọn)</label>
-                        <CategoryTopicSelector
-                          type="category"
-                          selectedItems={config.categories}
+                        <CategorySelector
+                          selectedCategories={config.categories}
                           onSelectionChange={(items) => setConfig(prev => ({...prev, categories: items}))}
                           className="w-full"
+                          title="Chọn danh mục luyện tập"
+                          description="Chọn các danh mục từ vựng mà bạn muốn luyện tập"
+                          icon={<span className="text-lg">🎯</span>}
                         />
                       </div>
                       
@@ -549,38 +572,48 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
 
             {/* Word Selection - Collapsible */}
             <Collapsible open={wordListExpanded} onOpenChange={setWordListExpanded}>
-              <Card>
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between mb-2">
+              <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-3">
-                      <Checkbox
-                        checked={selectedWords.length === getFilteredWords().length && getFilteredWords().length > 0}
-                        onCheckedChange={(checked) => {
-                          const filtered = getFilteredWords();
-                          if (checked) {
-                            setSelectedWords(filtered);
-                          } else {
-                            setSelectedWords([]);
-                          }
-                        }}
-                      />
-                      <span className="text-base font-medium">Chọn từ để luyện ({getFilteredWords().length} từ)</span>
+                      <div className="p-2 bg-orange-100 rounded-lg">
+                        <span className="text-orange-600">📝</span>
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-medium">Chọn từ để luyện</h3>
+                        <p className="text-sm text-muted-foreground">{getFilteredWords().length} từ phù hợp với bộ lọc</p>
+                      </div>
                     </div>
-                    <span className="text-sm text-muted-foreground">
-                      Đã chọn: {selectedWords.length} từ
-                    </span>
+                    <div className="text-right">
+                      <div className="text-sm font-medium text-primary">{selectedWords.length} từ</div>
+                      <div className="text-xs text-muted-foreground">đã chọn</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-3 mb-2">
+                    <Checkbox
+                      checked={selectedWords.length === getFilteredWords().length && getFilteredWords().length > 0}
+                      onCheckedChange={(checked) => {
+                        const filtered = getFilteredWords();
+                        if (checked) {
+                          setSelectedWords(filtered);
+                        } else {
+                          setSelectedWords([]);
+                        }
+                      }}
+                    />
+                    <span className="text-sm">Chọn tất cả từ vựng</span>
                   </div>
                   <CollapsibleTrigger className="w-full">
-                    <div className="flex items-center justify-center py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    <div className="flex items-center justify-center py-3 px-4 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-colors border border-dashed">
                       {wordListExpanded ? (
                         <>
-                          <span>Thu gọn danh sách</span>
-                          <ChevronUp className="h-4 w-4 ml-2" />
+                          <ChevronUp className="h-4 w-4 mr-2" />
+                          <span>Thu gọn danh sách từ vựng</span>
                         </>
                       ) : (
                         <>
-                          <span>Mở rộng danh sách</span>
-                          <ChevronDown className="h-4 w-4 ml-2" />
+                          <ChevronDown className="h-4 w-4 mr-2" />
+                          <span>Xem danh sách từ vựng</span>
                         </>
                       )}
                     </div>
@@ -665,15 +698,29 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
             </Collapsible>
 
             {/* Start Practice Button - Outside of collapsed sections */}
-            <div className="pt-4">
-              <Button
-                onClick={startPractice}
-                disabled={selectedWords.length === 0}
-                className="w-full bg-green-600 hover:bg-green-700"
-                size="lg"
-              >
-                Bắt đầu ôn ({selectedWords.length} từ)
-              </Button>
+            <div className="pt-6">
+              <Card className="border-0 shadow-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white overflow-hidden">
+                <CardContent className="p-0">
+                  <Button
+                    onClick={startPractice}
+                    disabled={selectedWords.length === 0}
+                    className="w-full h-16 bg-transparent hover:bg-white/10 text-white text-lg font-semibold rounded-none shadow-none border-0 disabled:opacity-50 disabled:bg-transparent"
+                    size="lg"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-white/20 rounded-lg">
+                        <span className="text-2xl">🚀</span>
+                      </div>
+                      <div className="text-left">
+                        <div>Bắt đầu luyện tập</div>
+                        <div className="text-sm opacity-90">
+                          {selectedWords.length > 0 ? `${selectedWords.length} từ đã chọn` : 'Chọn từ vựng để bắt đầu'}
+                        </div>
+                      </div>
+                    </div>
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 

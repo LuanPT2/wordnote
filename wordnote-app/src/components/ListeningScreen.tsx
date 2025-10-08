@@ -13,6 +13,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { CategoryTopicSelector } from './CategoryTopicSelector';
 import { DictionarySearchPopup } from './DictionarySearchPopup';
+import { CategorySelector } from './common/CategorySelector';
 
 interface ListeningScreenProps {
   onBack: () => void;
@@ -377,36 +378,39 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-purple-600 text-white p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onBack}
-              className="text-white hover:bg-white/20 p-2"
-            >
-              ←
-            </Button>
-            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              <span className="text-xl">🎵</span>
-            </div>
-            <div>
-              <h1 className="text-xl">Nghe</h1>
-              <p className="text-purple-100 text-sm">
-                {activeTab === 'listening' && selectedWords.length > 0 
-                  ? `${currentIndex + 1}/${selectedWords.length} • ${Math.round(progress)}%`
-                  : `${getSelectedWords().length} từ đã chọn`
-                }
-              </p>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50">
+      {/* Header with gradient */}
+      <div className="bg-gradient-to-r from-purple-600 to-violet-600 text-white p-6 shadow-lg">
+        <div className="flex items-center space-x-4">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onBack}
+            className="text-white hover:bg-white/20 p-2 rounded-lg transition-colors"
+          >
+            ←
+          </Button>
+          <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+            <span className="text-2xl">🎧</span>
           </div>
-          
-          <div className="flex items-center space-x-2">
-            {/* Dictionary Search Button */}
-            <Button
+          <div className="flex-1">
+            <h1 className="text-2xl font-semibold">Luyện nghe từ vựng</h1>
+            <p className="text-purple-100 text-sm mt-1 flex items-center space-x-2">
+              {activeTab === 'listening' && selectedWords.length > 0 ? (
+                <>
+                  <span>🎵 {currentIndex + 1}/{selectedWords.length}</span>
+                  <span>•</span>
+                  <span>📊 {Math.round(progress)}%</span>
+                </>
+              ) : (
+                <span>📚 {getSelectedWords().length} từ sẵn sàng</span>
+              )}
+            </p>
+          </div>
+
+
+          {/* Dictionary Search Button */}
+          <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowDictionaryPopup(true)}
@@ -415,38 +419,34 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
             >
               <BookOpen className="h-5 w-5" />
             </Button>
-            
-            {activeTab === 'listening' && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsBackgroundMode(!isBackgroundMode)}
-                className="text-white hover:bg-white/20"
-              >
-                {isBackgroundMode ? '🔇' : '🎵'} 
-              </Button>
-            )}
-          </div>
         </div>
       </div>
 
-      <div className="p-6">
+      <div className="p-6 bg-gradient-to-b from-muted/30 to-background min-h-screen">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="config">Cấu hình nghe</TabsTrigger>
-            <TabsTrigger value="listening">Đang nghe</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-white/50 backdrop-blur-sm border shadow-sm">
+            <TabsTrigger value="config" className="flex items-center space-x-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <Settings className="h-4 w-4" />
+              <span>Cấu hình</span>
+            </TabsTrigger>
+            <TabsTrigger value="listening" className="flex items-center space-x-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <span>🎧</span>
+              <span>Luyện nghe</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="config" className="space-y-6 mt-6">
             {/* Listening Mode - Collapsible */}
             <Collapsible open={modeExpanded} onOpenChange={setModeExpanded}>
-              <Card>
+              <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
                 <CollapsibleTrigger className="w-full">
-                  <CardHeader className="pb-2">
+                  <CardHeader className="pb-3 hover:bg-muted/20 transition-colors rounded-t-lg">
                     <CardTitle className="flex items-center justify-between text-left">
-                      <div className="flex items-center space-x-2">
-                        <Settings className="h-5 w-5" />
-                        <span>Chế độ nghe</span>
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-orange-100 rounded-lg">
+                          <Settings className="h-5 w-5 text-orange-600" />
+                        </div>
+                        <span className="text-lg">Chế độ nghe</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <span className="text-sm text-muted-foreground">
@@ -530,12 +530,19 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
 
             {/* Filters - Collapsible */}
             <Collapsible open={filtersExpanded} onOpenChange={setFiltersExpanded}>
-              <Card>
+              <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
                 <CollapsibleTrigger className="w-full">
-                  <CardHeader className="pb-2">
+                  <CardHeader className="pb-3 hover:bg-muted/20 transition-colors rounded-t-lg">
                     <CardTitle className="flex items-center justify-between text-left">
-                      <span>Bộ lọc</span>
-                      {filtersExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-purple-100 rounded-lg">
+                          <span className="text-purple-600 text-lg">🔍</span>
+                        </div>
+                        <span className="text-lg">Bộ lọc từ vựng</span>
+                      </div>
+                      <div className="p-1 hover:bg-muted rounded-md transition-colors">
+                        {filtersExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      </div>
                     </CardTitle>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -544,11 +551,13 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm mb-2">Danh mục ({config.categories.length} đã chọn)</label>
-                        <CategoryTopicSelector
-                          type="category"
-                          selectedItems={config.categories}
+                        <CategorySelector
+                          selectedCategories={config.categories}
                           onSelectionChange={(items) => setConfig(prev => ({...prev, categories: items}))}
                           className="w-full"
+                          title="Chọn danh mục cho bài nghe"
+                          description="Chọn các danh mục từ vựng cho bài luyện nghe của bạn"
+                          icon={<span className="text-lg">🎧</span>}
                         />
                       </div>
                       
@@ -701,24 +710,30 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
             </Collapsible>
 
             {/* Quick Start Options */}
-            <Card>
-              <CardContent className="p-6 text-center">
-                <div className="text-4xl mb-3">🎯</div>
-                <h3 className="mb-2">Bắt đầu nghe</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Nghe {getSelectedWords().length} từ đã chọn
-                </p>
-                
-                <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
-                  <DialogTrigger asChild>
-                    <Button 
-                      onClick={handleStartListeningWithSave}
-                      disabled={getSelectedWords().length === 0}
-                      className="w-full"
-                    >
-                      Bắt đầu ôn ({getSelectedWords().length} từ)
-                    </Button>
-                  </DialogTrigger>
+            <div className="pt-6">
+              <Card className="border-0 shadow-xl bg-gradient-to-r from-purple-500 to-violet-500 text-white overflow-hidden">
+                <CardContent className="p-0">
+                  <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        onClick={handleStartListeningWithSave}
+                        disabled={getSelectedWords().length === 0}
+                        className="w-full h-16 bg-transparent hover:bg-white/10 text-white text-lg font-semibold rounded-none shadow-none border-0 disabled:opacity-50 disabled:bg-transparent"
+                        size="lg"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="p-2 bg-white/20 rounded-lg">
+                            <span className="text-2xl">🎧</span>
+                          </div>
+                          <div className="text-left">
+                            <div>Bắt đầu luyện nghe</div>
+                            <div className="text-sm opacity-90">
+                              {getSelectedWords().length > 0 ? `${getSelectedWords().length} từ đã chọn` : 'Chọn từ vựng để bắt đầu'}
+                            </div>
+                          </div>
+                        </div>
+                      </Button>
+                    </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>Đặt tên danh sách từ vựng</DialogTitle>
@@ -748,8 +763,9 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* Saved Lists */}
             {savedLists.length > 0 && (
