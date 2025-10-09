@@ -12,7 +12,8 @@ import {
   X, 
   MoveRight,
   FileText,
-  Trash2
+  Trash2,
+  Edit
 } from 'lucide-react';
 import { vocabularyLibrary } from '../lib/vocabulary-library';
 import { Category, VocabularyItem } from '../lib/vocabulary-types';
@@ -209,13 +210,15 @@ export function CategoryBrowser({ onCategorySelect, onVocabularySelect, classNam
   };
 
   const handleVocabularySelect = (vocabId: string, checked: boolean) => {
-    const newSelected = new Set(selectedVocabulary);
-    if (checked) {
-      newSelected.add(vocabId);
-    } else {
-      newSelected.delete(vocabId);
-    }
-    setSelectedVocabulary(newSelected);
+    setSelectedVocabulary(prev => {
+      const newSelected = new Set(prev);
+      if (checked) {
+        newSelected.add(vocabId);
+      } else {
+        newSelected.delete(vocabId);
+      }
+      return newSelected;
+    });
   };
 
   const handleSelectAll = (checked: boolean) => {
@@ -316,46 +319,48 @@ export function CategoryBrowser({ onCategorySelect, onVocabularySelect, classNam
     return (
       <div className="space-y-2">
         <div className="flex items-center justify-between mb-4">
-          {selectedVocabulary.size > 0 && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setShowMoveDialog(true)}
-              className="flex items-center"
-            >
-              <MoveRight className="h-4 w-4 mr-1" />
-              Di chuyển
-            </Button>
-          )}
-        </div>
-
-        <div className="flex items-center space-x-2 mb-4">
-          <Checkbox
-            checked={isAllSelected}
-            indeterminate={isIndeterminate}
-            onCheckedChange={handleSelectAll}
-          />
-          <span className="text-sm">
-            Chọn tất cả {`(${selectedVocabulary.size}/${currentVocabulary.length})`}
-          </span>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              checked={isAllSelected}
+              indeterminate={isIndeterminate}
+              onCheckedChange={handleSelectAll}
+              className="h-6 w-6 rounded-md border-2 border-gray-400 data-[state=checked]:bg-primary data-[state=checked]:border-primary hover:scale-110 transition-transform duration-150"
+            />
+            <span className="text-sm">
+              All {`(${selectedVocabulary.size}/${currentVocabulary.length})`}
+            </span>
+          </div>
+          
+          <Button
+            size="default"
+            variant="outline"
+            onClick={() => setShowMoveDialog(true)}
+            disabled={selectedVocabulary.size === 0}
+            className="bg-purple-500 hover:bg-purple-600 text-white border-purple-600 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          >
+            <MoveRight className="h-5 w-5" />
+          </Button>
         </div>
 
         <ScrollArea className="h-[450px]">
-          <div className="space-y-1">
-            {currentVocabulary.map(item => (
-              <div 
-                key={item.id}
-                className="flex items-center space-x-3 p-2 border rounded-lg hover:bg-muted/50"
-              >
-                <Checkbox
-                  checked={selectedVocabulary.has(item.id)}
-                  onCheckedChange={(checked) => handleVocabularySelect(item.id, checked as boolean)}
-                />
-                <div className="flex-1">
-                  <span className="font-medium">{item.word}</span>
-                </div>
-              </div>
-            ))}
+          <div className="space-y-2">
+            {currentVocabulary.map(item => {
+              const isSelected = selectedVocabulary.has(item.id);
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    handleVocabularySelect(item.id, !isSelected);
+                  }}
+                  className={`w-full px-4 py-2 text-left text-base rounded-lg border transition-all ${
+                    isSelected
+                    ? 'bg-primary/10 border-gray-200 hover:bg-primary/15' 
+                    : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'                 }`}
+                >
+                  {item.word}
+                </button>
+              );
+            })}
           </div>
         </ScrollArea>
       </div>
@@ -552,29 +557,30 @@ export function CategoryBrowser({ onCategorySelect, onVocabularySelect, classNam
       <div className="w-1/2 pr-4 border-r">
         <div className="flex items-center justify-between mb-4">
           <div className="flex space-x-2">
-            {selectedCategory && (
-              <>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={openEditModal}
-                >
-                  Sửa
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={handleDeleteCategory}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </>
-            )}
             <Button
-              size="sm"
+              size="default"
               onClick={openCreateModal}
+              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2"
             >
-              <Plus className="h-4 w-4 mr-1" />
+              <Plus className="h-5 w-5" />
+            </Button>
+            <Button
+              size="default"
+              variant="outline"
+              onClick={openEditModal}
+              disabled={!selectedCategory}
+              className="bg-blue-500 hover:bg-blue-600 text-white border-blue-600 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500"
+            >
+              <Edit className="h-5 w-5" />
+            </Button>
+            <Button
+              size="default"
+              variant="destructive"
+              onClick={handleDeleteCategory}
+              disabled={!selectedCategory}
+              className="px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Trash2 className="h-5 w-5" />
             </Button>
           </div>
         </div>
