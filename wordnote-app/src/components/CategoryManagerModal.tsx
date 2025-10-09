@@ -17,9 +17,6 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
             <Folder className="h-5 w-5 mr-2" />
             Quản lý Danh mục
           </DialogTitle>
-          <DialogDescription>
-            Tạo, sửa, xóa danh mục và quản lý từ vựng theo danh mục
-          </DialogDescription>
         </DialogHeader>
 
         <div className="h-[70vh]">

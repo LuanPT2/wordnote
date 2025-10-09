@@ -1,0 +1,14 @@
+Menu Từ Vựng
+Menu Luyện Tập
+Menu Nghe
+Menu Story
+Menu Tự Do
+Danh Mục
+    - CategoryManagerModal.tsx     CategoryManagerModalProps { isOpen: boolean; onClose: () => void;}
+        => Định nghĩa header 
+        Nội dụng: 
+        - CategoryBrowser.tsx
+
+Từ Điển
+    - DictionarySearchPopup.tsx     DictionarySearchPopupProps {isOpen: boolean; onClose: () => void; onSaveWord: ... categories: string[];}
+        

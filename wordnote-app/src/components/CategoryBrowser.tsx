@@ -316,10 +316,6 @@ export function CategoryBrowser({ onCategorySelect, onVocabularySelect, classNam
     return (
       <div className="space-y-2">
         <div className="flex items-center justify-between mb-4">
-          <h4 className="flex items-center">
-            <FileText className="h-4 w-4 mr-2" />
-            Từ vựng ({currentVocabulary.length})
-          </h4>
           {selectedVocabulary.size > 0 && (
             <Button
               size="sm"
@@ -340,7 +336,7 @@ export function CategoryBrowser({ onCategorySelect, onVocabularySelect, classNam
             onCheckedChange={handleSelectAll}
           />
           <span className="text-sm">
-            Chọn tất cả {selectedVocabulary.size > 0 && `(${selectedVocabulary.size})`}
+            Chọn tất cả {`(${selectedVocabulary.size}/${currentVocabulary.length})`}
           </span>
         </div>
 
@@ -579,7 +575,6 @@ export function CategoryBrowser({ onCategorySelect, onVocabularySelect, classNam
               onClick={openCreateModal}
             >
               <Plus className="h-4 w-4 mr-1" />
-              Tạo mới
             </Button>
           </div>
         </div>

@@ -6,7 +6,6 @@ import { Card, CardContent } from './ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { 
-  X, 
   Search, 
   Volume2, 
   Star, 
@@ -254,14 +253,7 @@ export function DictionarySearchPopup({
                 <p className="text-blue-100 text-sm">Tra cứu và lưu từ vựng</p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="text-white hover:bg-white/20"
-            >
-              <X className="h-6 w-6" />
-            </Button>
+            {/* Using default dialog close button (top-right) */}
           </div>
 
           {/* Search Bar */}
