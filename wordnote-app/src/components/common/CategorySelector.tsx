@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Checkbox } from '../ui/checkbox';
 import { Badge } from '../ui/badge';
 import { ScrollArea } from '../ui/scroll-area';
-import { ChevronDown, ChevronRight, Folder, FolderOpen } from 'lucide-react';
+import { ChevronDown, ChevronRight, Folder, FolderOpen, FileText } from 'lucide-react';
 import { vocabularyLibrary } from '../../lib/vocabulary-library';
 import { Category } from '../../lib/vocabulary-types';
 
@@ -166,15 +166,10 @@ export function CategorySelector({
               <div className="h-6 w-6" />
             )}
             
-            <div 
-              className="h-4 w-4 rounded-full border-2 border-white shadow-sm"
-              style={{ backgroundColor: node.color || '#64748b' }}
-            />
-            
             {hasChildren ? (
               isExpanded ? <FolderOpen className="h-4 w-4 text-muted-foreground" /> : <Folder className="h-4 w-4 text-muted-foreground" />
             ) : (
-              <div className="h-4 w-4 rounded bg-muted/30" />
+              <FileText className="h-4 w-4 mr-2 text-muted-foreground" />
             )}
             
             <Checkbox
