@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Button } from './ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Checkbox } from './ui/checkbox';
-import { Badge } from './ui/badge';
+import { Button } from '../ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
+import { Checkbox } from '../ui/checkbox';
+import { Badge } from '../ui/badge';
 import { ChevronDown } from 'lucide-react';
 
-interface CategoryTopicSelectorProps {
+interface TopicSelectorProps {
   type: 'category' | 'topic';
   selectedItems: string[];
   onSelectionChange: (items: string[]) => void;
@@ -13,13 +13,13 @@ interface CategoryTopicSelectorProps {
   className?: string;
 }
 
-export function CategoryTopicSelector({ 
+export function TopicSelector({ 
   type, 
   selectedItems, 
   onSelectionChange, 
   trigger,
   className 
-}: CategoryTopicSelectorProps) {
+}: TopicSelectorProps) {
   const [open, setOpen] = useState(false);
   
   const categories = ['Harry Potter', 'Luyện TOEIC', 'Daily', 'New', 'Business', 'Story'];

@@ -8,13 +8,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Checkbox } from './ui/checkbox';
 import { Progress } from './ui/progress';
 import { ChevronLeft, ChevronRight, Play, Pause, Settings, Eye, EyeOff, ChevronDown, ChevronUp, BookOpen, Search } from 'lucide-react';
-import { CategoryManagerModal } from './CategoryManagerModal';
+import { CategoryManagerModal } from './modal/CategoryModal/CategoryManagerModal';
 import { Slider } from './ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
-import { CategoryTopicSelector } from './CategoryTopicSelector';
+import { TopicSelector } from './common/TopicSelector';
 import { CategorySelector } from './common/CategorySelector';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { DictionarySearchPopup } from './DictionarySearchPopup';
+import { DictionarySearchModal } from './modal/DictionarySearch/DictionarySearchModal';
 
 interface PracticeScreenProps {
   onBack: () => void;
@@ -516,7 +516,7 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
                       
                       <div>
                         <label className="block text-sm mb-2">Chủ đề ({config.topics.length} đã chọn)</label>
-                        <CategoryTopicSelector
+                        <TopicSelector
                           type="topic"
                           selectedItems={config.topics}
                           onSelectionChange={(items) => setConfig(prev => ({...prev, topics: items}))}
@@ -918,7 +918,7 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
       </div>
 
       {/* Dictionary Search Popup */}
-      <DictionarySearchPopup
+      <DictionarySearchModal
         isOpen={showDictionaryPopup}
         onClose={() => setShowDictionaryPopup(false)}
         onSaveWord={handleSaveWordFromDictionary}

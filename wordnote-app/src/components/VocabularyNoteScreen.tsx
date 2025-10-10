@@ -8,8 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Plus, X, Filter, SortAsc, BookOpen, Search } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { DictionarySearchPopup } from './DictionarySearchPopup';
-import { CategoryManagerModal } from './CategoryManagerModal';
+import { DictionarySearchModal } from './modal/DictionarySearch/DictionarySearchModal';
+import { CategoryManagerModal } from './modal/CategoryModal/CategoryManagerModal';
 
 interface VocabularyNoteScreenProps {
   onBack: () => void;
@@ -754,7 +754,7 @@ export function VocabularyNoteScreen({ onBack }: VocabularyNoteScreenProps) {
       </div>
 
       {/* Dictionary Search Popup */}
-      <DictionarySearchPopup
+      <DictionarySearchModal
         isOpen={showDictionaryPopup}
         onClose={() => setShowDictionaryPopup(false)}
         onSaveWord={handleSaveWordFromDictionary}

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../ui/dialog';
 import { Folder } from 'lucide-react';
-import { CategoryBrowser } from './CategoryBrowser';
+import { CategoryContent } from './CategoryContent';
 
 interface CategoryManagerModalProps {
   isOpen: boolean;
@@ -20,7 +20,7 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
         </DialogHeader>
 
         <div className="h-[70vh]">
-          <CategoryBrowser />
+          <CategoryContent />
         </div>
       </DialogContent>
     </Dialog>

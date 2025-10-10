@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Badge } from './ui/badge';
-import { ScrollArea } from './ui/scroll-area';
-import { Checkbox } from './ui/checkbox';
+import { Button } from '../../ui/button';
+import { Input } from '../../ui/input';
+import { Badge } from '../../ui/badge';
+import { ScrollArea } from '../../ui/scroll-area';
+import { Checkbox } from '../../ui/checkbox';
 import { 
   Folder, 
   FolderOpen, 
@@ -15,9 +15,9 @@ import {
   Trash2,
   Edit
 } from 'lucide-react';
-import { vocabularyLibrary } from '../lib/vocabulary-library';
-import MoveFolderPopup from './popup/MoveFolderPopup';
-import { Category, VocabularyItem } from '../lib/vocabulary-types';
+import { vocabularyLibrary } from '../../../lib/vocabulary-library';
+import CategoryMovePopup from './CategoryMovePopup';
+import { Category, VocabularyItem } from '../../../lib/vocabulary-types';
 
 interface CategoryNode extends Category {
   children: CategoryNode[];
@@ -25,7 +25,7 @@ interface CategoryNode extends Category {
   level: number;
 }
 
-interface CategoryBrowserProps {
+interface CategoryContentProps {
   onCategorySelect?: (category: Category | null) => void;
   onVocabularySelect?: (vocabulary: VocabularyItem[]) => void;
   className?: string;
@@ -43,7 +43,7 @@ const COLOR_OPTIONS = [
   'bg-gray-100 text-gray-800'
 ];
 
-export function CategoryBrowser({ onCategorySelect, onVocabularySelect, className = '' }: CategoryBrowserProps) {
+export function CategoryContent({ onCategorySelect, onVocabularySelect, className = '' }: CategoryContentProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [vocabulary, setVocabulary] = useState<VocabularyItem[]>([]);
   const [categoryTree, setCategoryTree] = useState<CategoryNode[]>([]);
@@ -479,7 +479,7 @@ export function CategoryBrowser({ onCategorySelect, onVocabularySelect, classNam
     const selectedVocabItems = vocabulary.filter(v => selectedVocabulary.has(v.id));
 
     return (
-      <MoveFolderPopup
+      <CategoryMovePopup
         open={showMoveDialog}
         onClose={() => {
           setShowMoveDialog(false);

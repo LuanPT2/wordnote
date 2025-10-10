@@ -38,7 +38,7 @@ export function VocabularyManager({
   // Dialog states
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showCategoryCreator, setShowCategoryCreator] = useState(false);
-  const [showMoveCategoryDialog, setShowMoveCategoryDialog] = useState(false);
+  const [showCategoryMoveDialog, setShowCategoryMoveDialog] = useState(false);
   
   // Filter and search states
   const [searchTerm, setSearchTerm] = useState(initialFilter.searchTerm || '');
@@ -238,7 +238,7 @@ export function VocabularyManager({
     }
   };
 
-  const handleBulkMoveCategory = (newCategory: string) => {
+  const handleBulkCategoryMove = (newCategory: string) => {
     try {
       vocabularyLibrary.executeBulkOperation({
         type: 'move-category',
@@ -249,7 +249,7 @@ export function VocabularyManager({
       loadData();
       setSelectedItems([]);
       setSelectAll(false);
-      setShowMoveCategoryDialog(false);
+      setShowCategoryMoveDialog(false);
     } catch (error) {
       console.error('Error bulk moving category:', error);
     }
@@ -398,7 +398,7 @@ export function VocabularyManager({
         <div className="mb-4 p-3 bg-blue-50 rounded-lg flex items-center justify-between">
           <span className="text-sm">Đã chọn {selectedItems.length} từ</span>
           <div className="flex space-x-2">
-            <Button variant="outline" size="sm" onClick={() => setShowMoveCategoryDialog(true)}>
+            <Button variant="outline" size="sm" onClick={() => setShowCategoryMoveDialog(true)}>
               Chuyển danh mục
             </Button>
             <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
@@ -798,7 +798,7 @@ export function VocabularyManager({
       </Dialog>
 
       {/* Move Category Dialog */}
-      <Dialog open={showMoveCategoryDialog} onOpenChange={setShowMoveCategoryDialog}>
+      <Dialog open={showCategoryMoveDialog} onOpenChange={setShowCategoryMoveDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Chuyển danh mục</DialogTitle>
@@ -807,7 +807,7 @@ export function VocabularyManager({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <Select onValueChange={handleBulkMoveCategory}>
+            <Select onValueChange={handleBulkCategoryMove}>
               <SelectTrigger>
                 <SelectValue placeholder="Chọn danh mục" />
               </SelectTrigger>

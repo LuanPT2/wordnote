@@ -5,10 +5,10 @@ import { Badge } from './ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { BookOpen, Image as ImageIcon, Volume2, Plus, Star, ChevronRight, Filter, Search } from 'lucide-react';
-import { CategoryManagerModal } from './CategoryManagerModal';
+import { CategoryManagerModal } from './modal/CategoryModal/CategoryManagerModal';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Progress } from './ui/progress';
-import { DictionarySearchPopup } from './DictionarySearchPopup';
+import { DictionarySearchModal } from './modal/DictionarySearch/DictionarySearchModal';
 
 interface FreeStudyScreenProps {
   onBack: () => void;
@@ -772,7 +772,7 @@ export function FreeStudyScreen({ onBack }: FreeStudyScreenProps) {
       </div>
 
       {/* Dictionary Search Popup */}
-      <DictionarySearchPopup
+      <DictionarySearchModal
         isOpen={showDictionaryPopup}
         onClose={() => setShowDictionaryPopup(false)}
         onSaveWord={handleSaveWordFromDictionary}

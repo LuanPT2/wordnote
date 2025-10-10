@@ -1,22 +1,22 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Badge } from "./ui/badge";
-import { Card, CardContent } from "./ui/card";
+import { Button } from "../../ui/button";
+import { Input } from "../../ui/input";
+import { Badge } from "../../ui/badge";
+import { Card, CardContent } from "../../ui/card";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog";
+} from "../../ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "../../ui/select";
 import {
   X,
   Search,
@@ -32,7 +32,7 @@ import {
   Share2,
   ChevronRight,
 } from "lucide-react";
-import { ScrollArea } from "./ui/scroll-area";
+import { ScrollArea } from "../../ui/scroll-area";
 
 interface DictionaryEntry {
   word: string;
@@ -48,7 +48,7 @@ interface DictionaryEntry {
   level: "beginner" | "intermediate" | "advanced";
 }
 
-interface DictionarySearchPopupProps {
+interface DictionarySearchModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSaveWord: (
@@ -60,12 +60,12 @@ interface DictionarySearchPopupProps {
   categories: string[];
 }
 
-export function DictionarySearchPopup({
+export function DictionarySearchModal({
   isOpen,
   onClose,
   onSaveWord,
   categories,
-}: DictionarySearchPopupProps) {
+}: DictionarySearchModalProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<
     DictionaryEntry[]

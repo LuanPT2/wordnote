@@ -9,11 +9,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Input } from './ui/input';
 import { Settings, Play, Pause, SkipForward, SkipBack, Volume2, Shuffle, Eye, EyeOff, ChevronDown, ChevronUp, Trash2, BookOpen, Search } from 'lucide-react';
-import { CategoryManagerModal } from './CategoryManagerModal';
+import { CategoryManagerModal } from './modal/CategoryModal/CategoryManagerModal';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
-import { CategoryTopicSelector } from './CategoryTopicSelector';
-import { DictionarySearchPopup } from './DictionarySearchPopup';
+import { TopicSelector } from './common/TopicSelector';
+import { DictionarySearchModal } from './modal/DictionarySearch/DictionarySearchModal';
 import { CategorySelector } from './common/CategorySelector';
 
 interface ListeningScreenProps {
@@ -581,7 +581,7 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
                       
                       <div>
                         <label className="block text-sm mb-2">Chủ đề ({config.topics.length} đã chọn)</label>
-                        <CategoryTopicSelector
+                        <TopicSelector
                           type="topic"
                           selectedItems={config.topics}
                           onSelectionChange={(items) => setConfig(prev => ({...prev, topics: items}))}
@@ -1002,7 +1002,7 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
       </div>
 
       {/* Dictionary Search Popup */}
-      <DictionarySearchPopup
+      <DictionarySearchModal
         isOpen={showDictionaryPopup}
         onClose={() => setShowDictionaryPopup(false)}
         onSaveWord={handleSaveWordFromDictionary}

@@ -6,11 +6,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Checkbox } from './ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Play, Pause, Volume2, Settings, Eye, EyeOff, ChevronLeft, ChevronRight, BookOpen, Heart, Users, Search } from 'lucide-react';
-import { CategoryManagerModal } from './CategoryManagerModal';
+import { CategoryManagerModal } from './modal/CategoryModal/CategoryManagerModal';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Progress } from './ui/progress';
 import { Slider } from './ui/slider';
-import { DictionarySearchPopup } from './DictionarySearchPopup';
+import { DictionarySearchModal } from './modal/DictionarySearch/DictionarySearchModal';
 
 interface StoryScreenProps {
   onBack: () => void;
@@ -943,7 +943,7 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
       </div>
 
       {/* Dictionary Search Popup */}
-      <DictionarySearchPopup
+      <DictionarySearchModal
         isOpen={showDictionaryPopup}
         onClose={() => setShowDictionaryPopup(false)}
         onSaveWord={handleSaveWordFromDictionary}

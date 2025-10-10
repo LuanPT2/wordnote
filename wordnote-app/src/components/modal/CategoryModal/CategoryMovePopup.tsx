@@ -1,9 +1,9 @@
 import React from 'react';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { ScrollArea } from '../ui/scroll-area';
+import { Button } from '../../ui/button';
+import { Badge } from '../../ui/badge';
+import { ScrollArea } from '../../ui/scroll-area';
 import { Folder, MoveRight, X } from 'lucide-react';
-import { VocabularyItem } from '../../lib/vocabulary-types';
+import { VocabularyItem } from '../../../lib/vocabulary-types';
 
 interface DropdownOption {
   id: string;
@@ -11,7 +11,7 @@ interface DropdownOption {
   level: number;
 }
 
-interface MoveFolderPopupProps {
+interface CategoryMovePopupProps {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -24,7 +24,7 @@ interface MoveFolderPopupProps {
 
 // Popup for moving selected vocabulary to another category
 // Keep UI consistent with the inline dialog previously used in CategoryBrowser
-export function MoveFolderPopup({
+export function CategoryMovePopup({
   open,
   onClose,
   onConfirm,
@@ -33,7 +33,7 @@ export function MoveFolderPopup({
   dropdownOptions,
   targetCategoryId,
   onTargetCategoryChange,
-}: MoveFolderPopupProps) {
+}: CategoryMovePopupProps) {
   if (!open) return null;
 
   return (
@@ -116,6 +116,6 @@ export function MoveFolderPopup({
   );
 }
 
-export default MoveFolderPopup;
+export default CategoryMovePopup;
 
 

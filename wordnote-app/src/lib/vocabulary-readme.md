@@ -181,7 +181,7 @@ vocabularyUtils.importFromJSON(file).then(success => {
 
 ### 1. Màn hình Vocabulary (đã tích hợp)
 - Sử dụng `VocabularyManager` component
-- Tích hợp với `DictionarySearchPopup`
+- Tích hợp với `DictionarySearchModal`
 
 ### 2. Màn hình Practice
 ```typescript

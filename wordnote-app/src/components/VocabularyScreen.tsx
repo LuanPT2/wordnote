@@ -12,9 +12,9 @@ import { Checkbox } from './ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
-import { CategoryTopicSelector } from './CategoryTopicSelector';
-import { DictionarySearchPopup } from './DictionarySearchPopup';
-import { CategoryManagerModal } from './CategoryManagerModal';
+import { TopicSelector } from './common/TopicSelector';
+import { DictionarySearchModal } from './modal/DictionarySearch/DictionarySearchModal';
+import { CategoryManagerModal } from './modal/CategoryModal/CategoryManagerModal';
 
 interface VocabularyScreenProps {
   onBack: () => void;
@@ -79,7 +79,7 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
   // Bulk selection
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
-  const [showMoveCategoryDialog, setShowMoveCategoryDialog] = useState(false);
+  const [showCategoryMoveDialog, setShowCategoryMoveDialog] = useState(false);
 
   // Category management
   const [showCategoryDialog, setShowCategoryDialog] = useState(false);
@@ -363,7 +363,7 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
     setSelectAll(false);
   };
 
-  const handleBulkMoveCategory = (newCategory: string) => {
+  const handleBulkCategoryMove = (newCategory: string) => {
     setVocabularyList(prev =>
       prev.map(item =>
         selectedItems.includes(item.id)
@@ -373,7 +373,7 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
     );
     setSelectedItems([]);
     setSelectAll(false);
-    setShowMoveCategoryDialog(false);
+    setShowCategoryMoveDialog(false);
   };
 
   const toggleColumnVisibility = (column: string) => {
@@ -878,7 +878,7 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm mb-2">Danh mục</label>
-                <CategoryTopicSelector
+                <TopicSelector
                   type="category"
                   selectedItems={filterCategoryList}
                   onSelectionChange={setFilterCategoryList}
@@ -888,7 +888,7 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
               
               <div>
                 <label className="block text-sm mb-2">Chủ đề</label>
-                <CategoryTopicSelector
+                <TopicSelector
                   type="topic"
                   selectedItems={filterTopicList}
                   onSelectionChange={setFilterTopicList}
@@ -1011,7 +1011,7 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
             </div>
             {selectedItems.length > 0 && (
               <div className="flex space-x-2">
-                <Dialog open={showMoveCategoryDialog} onOpenChange={setShowMoveCategoryDialog}>
+                <Dialog open={showCategoryMoveDialog} onOpenChange={setShowCategoryMoveDialog}>
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm">
                       Chuyển danh mục
@@ -1025,7 +1025,7 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
-                      <Select onValueChange={handleBulkMoveCategory}>
+                      <Select onValueChange={handleBulkCategoryMove}>
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn danh mục mới" />
                         </SelectTrigger>
@@ -1157,7 +1157,7 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
       </div>
 
       {/* Dictionary Search Popup */}
-      <DictionarySearchPopup
+      <DictionarySearchModal
         isOpen={showDictionaryPopup}
         onClose={() => setShowDictionaryPopup(false)}
         onSaveWord={handleSaveWordFromDictionary}

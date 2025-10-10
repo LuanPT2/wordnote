@@ -11,5 +11,5 @@ Danh Mục
         - CategoryBrowser.tsx
 
 Từ Điển
-    - DictionarySearchPopup.tsx     DictionarySearchPopupProps {isOpen: boolean; onClose: () => void; onSaveWord: ... categories: string[];}
+    - DictionarySearchModal.tsx     DictionarySearchModalProps {isOpen: boolean; onClose: () => void; onSaveWord: ... categories: string[];}
         
