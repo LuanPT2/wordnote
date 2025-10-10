@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Checkbox } from './ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Play, Pause, Volume2, Settings, Eye, EyeOff, ChevronLeft, ChevronRight, BookOpen, Heart, Users, Search } from 'lucide-react';
+import { CategoryManagerModal } from './CategoryManagerModal';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Progress } from './ui/progress';
 import { Slider } from './ui/slider';
@@ -77,6 +78,8 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
 
   // Dictionary popup state
   const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
+  // Category manager modal
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
 
   // Mock video data
   const [videoStories, setVideoStories] = useState<VideoStory[]>([
@@ -776,16 +779,32 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
             </div>
           </div>
           
-          {/* Dictionary Search Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowDictionaryPopup(true)}
-            className="text-white hover:bg-white/20"
-            title="Tra từ điển"
-          >
-            <BookOpen className="h-5 w-5" />
-          </Button>
+          {/* Header Actions */}
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowDictionaryPopup(true)}
+              className="text-white hover:bg-white/20"
+              title="Tra từ điển"
+            >
+              <BookOpen className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowCategoryManager(true)}
+              className="text-white hover:bg-white/20"
+              title="Quản lý danh mục"
+            >
+              {/* folder icon using heroicons URL for consistency with VocabularyScreen */}
+              <img
+                src="https://unpkg.com/heroicons@2.1.1/24/outline/folder.svg"
+                alt="Categories"
+                className="h-5 w-5 invert"
+              />
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -929,6 +948,11 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
         onClose={() => setShowDictionaryPopup(false)}
         onSaveWord={handleSaveWordFromDictionary}
         categories={['Harry Potter', 'TOEIC', 'Daily']}
+      />
+      {/* Category Manager Modal */}
+      <CategoryManagerModal
+        isOpen={showCategoryManager}
+        onClose={() => setShowCategoryManager(false)}
       />
     </div>
   );

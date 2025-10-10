@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Plus, X, Filter, SortAsc, BookOpen, Search } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { DictionarySearchPopup } from './DictionarySearchPopup';
+import { CategoryManagerModal } from './CategoryManagerModal';
 
 interface VocabularyNoteScreenProps {
   onBack: () => void;
@@ -70,6 +71,8 @@ export function VocabularyNoteScreen({ onBack }: VocabularyNoteScreenProps) {
 
   // Dictionary popup state
   const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
+  // Category manager modal
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
 
   const [vocabularyList, setVocabularyList] = useState<VocabularyItem[]>([
     {
@@ -321,16 +324,31 @@ export function VocabularyNoteScreen({ onBack }: VocabularyNoteScreenProps) {
           </div>
 
                
-          {/* Dictionary Search Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowDictionaryPopup(true)}
-            className="text-white hover:bg-white/20"
-            title="Tra từ điển"
-          >
-            <BookOpen className="h-5 w-5" />
-          </Button>
+          {/* Header Actions */}
+          <div className="ml-auto flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowDictionaryPopup(true)}
+              className="text-white hover:bg-white/20"
+              title="Tra từ điển"
+            >
+              <BookOpen className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowCategoryManager(true)}
+              className="text-white hover:bg-white/20"
+              title="Quản lý danh mục"
+            >
+              <img
+                src="https://unpkg.com/heroicons@2.1.1/24/outline/folder.svg"
+                alt="Categories"
+                className="h-5 w-5 invert"
+              />
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -741,6 +759,11 @@ export function VocabularyNoteScreen({ onBack }: VocabularyNoteScreenProps) {
         onClose={() => setShowDictionaryPopup(false)}
         onSaveWord={handleSaveWordFromDictionary}
         categories={categories.filter(cat => cat !== 'Tất cả')}
+      />
+      {/* Category Manager Modal */}
+      <CategoryManagerModal
+        isOpen={showCategoryManager}
+        onClose={() => setShowCategoryManager(false)}
       />
     </div>
   );

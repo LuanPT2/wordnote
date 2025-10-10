@@ -5,6 +5,7 @@ import { Badge } from './ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { BookOpen, Image as ImageIcon, Volume2, Plus, Star, ChevronRight, Filter, Search } from 'lucide-react';
+import { CategoryManagerModal } from './CategoryManagerModal';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Progress } from './ui/progress';
 import { DictionarySearchPopup } from './DictionarySearchPopup';
@@ -55,6 +56,8 @@ export function FreeStudyScreen({ onBack }: FreeStudyScreenProps) {
 
   // Dictionary popup state
   const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
+  // Category manager modal
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
 
   // Mock study data
   const studyTopics: StudyTopic[] = [
@@ -623,16 +626,31 @@ export function FreeStudyScreen({ onBack }: FreeStudyScreenProps) {
             </div>
           </div>
           
-          {/* Dictionary Search Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowDictionaryPopup(true)}
-            className="text-white hover:bg-white/20"
-            title="Tra từ điển"
-          >
-            <BookOpen className="h-5 w-5" />
-          </Button>
+          {/* Header Actions */}
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowDictionaryPopup(true)}
+              className="text-white hover:bg-white/20"
+              title="Tra từ điển"
+            >
+              <BookOpen className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowCategoryManager(true)}
+              className="text-white hover:bg-white/20"
+              title="Quản lý danh mục"
+            >
+              <img
+                src="https://unpkg.com/heroicons@2.1.1/24/outline/folder.svg"
+                alt="Categories"
+                className="h-5 w-5 invert"
+              />
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -759,6 +777,11 @@ export function FreeStudyScreen({ onBack }: FreeStudyScreenProps) {
         onClose={() => setShowDictionaryPopup(false)}
         onSaveWord={handleSaveWordFromDictionary}
         categories={['Nature', 'Food', 'Transportation', 'Career']}
+      />
+      {/* Category Manager Modal */}
+      <CategoryManagerModal
+        isOpen={showCategoryManager}
+        onClose={() => setShowCategoryManager(false)}
       />
     </div>
   );

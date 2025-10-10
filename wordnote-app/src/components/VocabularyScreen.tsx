@@ -6,6 +6,7 @@ import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Plus, X, Filter, Edit, Trash2, MoreVertical, ChevronDown, ChevronUp, BookOpen, Folder } from 'lucide-react';
+import dictionaryIcon from '../assets/dictionary.svg';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Checkbox } from './ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
@@ -540,7 +541,11 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
               className="text-white hover:bg-white/20"
               title="Quản lý danh mục"
             >
-              <Folder className="h-5 w-5" />
+              <img
+                src="https://unpkg.com/heroicons@2.1.1/24/outline/folder.svg"
+                alt="Categories"
+                className="h-5 w-5 invert"
+              />
             </Button>
           </div>
         </div>

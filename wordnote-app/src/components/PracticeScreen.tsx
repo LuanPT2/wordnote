@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Checkbox } from './ui/checkbox';
 import { Progress } from './ui/progress';
 import { ChevronLeft, ChevronRight, Play, Pause, Settings, Eye, EyeOff, ChevronDown, ChevronUp, BookOpen, Search } from 'lucide-react';
+import { CategoryManagerModal } from './CategoryManagerModal';
 import { Slider } from './ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { CategoryTopicSelector } from './CategoryTopicSelector';
@@ -84,6 +85,8 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
 
   // Dictionary popup state
   const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
+  // Category manager modal
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
 
   // Mock vocabulary data
   const vocabularyList: VocabularyItem[] = [
@@ -347,16 +350,31 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
             </p>
           </div>
 
-          {/* Dictionary Search Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowDictionaryPopup(true)}
-            className="text-white hover:bg-white/20"
-            title="Tra từ điển"
-          >
-            <BookOpen className="h-5 w-5" />
-          </Button>
+          {/* Header Actions */}
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowDictionaryPopup(true)}
+              className="text-white hover:bg-white/20"
+              title="Tra từ điển"
+            >
+              <BookOpen className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowCategoryManager(true)}
+              className="text-white hover:bg-white/20"
+              title="Quản lý danh mục"
+            >
+              <img
+                src="https://unpkg.com/heroicons@2.1.1/24/outline/folder.svg"
+                alt="Categories"
+                className="h-5 w-5 invert"
+              />
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -905,6 +923,11 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
         onClose={() => setShowDictionaryPopup(false)}
         onSaveWord={handleSaveWordFromDictionary}
         categories={['Harry Potter', 'Luyện TOEIC', 'Daily', 'New', 'Story']}
+      />
+      {/* Category Manager Modal */}
+      <CategoryManagerModal
+        isOpen={showCategoryManager}
+        onClose={() => setShowCategoryManager(false)}
       />
     </div>
   );

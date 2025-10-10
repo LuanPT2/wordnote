@@ -1,4 +1,5 @@
 Menu Từ Vựng
+    VocabularyScreen.tsx
 Menu Luyện Tập
 Menu Nghe
 Menu Story
