@@ -16,6 +16,7 @@ import {
   Edit
 } from 'lucide-react';
 import { vocabularyLibrary } from '../lib/vocabulary-library';
+import MoveFolderPopup from './popup/MoveFolderPopup';
 import { Category, VocabularyItem } from '../lib/vocabulary-types';
 
 interface CategoryNode extends Category {
@@ -478,76 +479,19 @@ export function CategoryBrowser({ onCategorySelect, onVocabularySelect, classNam
     const selectedVocabItems = vocabulary.filter(v => selectedVocabulary.has(v.id));
 
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-background border rounded-lg max-w-md w-full mx-4 max-h-[80vh] overflow-hidden">
-          {/* Header with gradient */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4">
-            <h3 className="flex items-center text-lg font-semibold">
-              <MoveRight className="h-5 w-5 mr-2" />
-              Di chuyển từ vựng
-            </h3>
-            <p className="text-blue-100 text-sm mt-1">
-              Di chuyển {selectedVocabulary.size} từ vựng được chọn
-            </p>
-          </div>
-          
-          <div className="p-4">
-            {/* Preview selected vocabulary */}
-            <div className="mb-4 p-3 bg-muted rounded-lg">
-              <h4 className="text-sm font-medium mb-2">Từ vựng được chọn:</h4>
-              <ScrollArea className="max-h-[120px]">
-                <div className="space-y-1">
-                  {selectedVocabItems.map(item => (
-                    <div key={item.id} className="text-xs text-muted-foreground">
-                      • {item.word}
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
-                Chọn danh mục đích:
-              </label>
-              <select
-                value={targetCategoryForMove}
-                onChange={(e) => setTargetCategoryForMove(e.target.value)}
-                className="w-full p-2 border rounded-lg bg-background focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
-              >
-                <option value="">-- Chọn danh mục --</option>
-                {buildCategoryDropdownList().map(cat => (
-                  <option key={cat.id} value={cat.id}>
-                    {'  '.repeat(cat.level)}
-                    {cat.level > 0 ? '└─ ' : ''}
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex space-x-2">
-              <Button
-                onClick={handleMoveVocabulary}
-                disabled={!targetCategoryForMove}
-                className="flex-1"
-              >
-                Di chuyển
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowMoveDialog(false);
-                  setTargetCategoryForMove('');
-                }}
-                className="flex-1"
-              >
-                Hủy
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <MoveFolderPopup
+        open={showMoveDialog}
+        onClose={() => {
+          setShowMoveDialog(false);
+          setTargetCategoryForMove('');
+        }}
+        onConfirm={handleMoveVocabulary}
+        selectedCount={selectedVocabulary.size}
+        selectedVocabItems={selectedVocabItems}
+        dropdownOptions={buildCategoryDropdownList()}
+        targetCategoryId={targetCategoryForMove}
+        onTargetCategoryChange={(id) => setTargetCategoryForMove(id)}
+      />
     );
   };
 
