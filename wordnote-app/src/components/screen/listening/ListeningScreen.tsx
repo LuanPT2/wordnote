@@ -1,20 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Progress } from './ui/progress';
-import { Badge } from './ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Checkbox } from './ui/checkbox';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Input } from './ui/input';
+import { Button } from '../../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
+import { Progress } from '../../ui/progress';
+import { Badge } from '../../ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
+import { Checkbox } from '../../ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/dialog';
+import { Input } from '../../ui/input';
 import { Settings, Play, Pause, SkipForward, SkipBack, Volume2, Shuffle, Eye, EyeOff, ChevronDown, ChevronUp, Trash2, BookOpen, Search } from 'lucide-react';
-import { CategoryManagerModal } from './modal/CategoryModal/CategoryManagerModal';
-import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
-import { TopicSelector } from './common/TopicSelector';
-import { DictionarySearchModal } from './modal/DictionarySearch/DictionarySearchModal';
-import { CategorySelector } from './common/CategorySelector';
+import { CategoryManagerModal } from '../../modal/CategoryModal/CategoryManagerModal';
+import { ImageWithFallback } from '../../figma/ImageWithFallback';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../ui/collapsible';
+import { TopicSelector } from '../../common/TopicSelector';
+import { DictionarySearchModal } from '../../modal/DictionarySearch/DictionarySearchModal';
+import { CategorySelector } from '../../common/CategorySelector';
 
 interface ListeningScreenProps {
   onBack: () => void;

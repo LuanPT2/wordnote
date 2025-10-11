@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Button } from '../../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
+import { Badge } from '../../ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs';
 import { BookOpen, Image as ImageIcon, Volume2, Plus, Star, ChevronRight, Filter, Search } from 'lucide-react';
-import { CategoryManagerModal } from './modal/CategoryModal/CategoryManagerModal';
-import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Progress } from './ui/progress';
-import { DictionarySearchModal } from './modal/DictionarySearch/DictionarySearchModal';
+import { CategoryManagerModal } from '../../modal/CategoryModal/CategoryManagerModal';
+import { ImageWithFallback } from '../../figma/ImageWithFallback';
+import { Progress } from '../../ui/progress';
+import { DictionarySearchModal } from '../../modal/DictionarySearch/DictionarySearchModal';
 
 interface FreeStudyScreenProps {
   onBack: () => void;

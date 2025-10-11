@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { Button } from '../../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../ui/card';
+import { ImageWithFallback } from '../../figma/ImageWithFallback';
 
 interface LoginScreenProps {
   onLogin: (provider: string) => void;

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { LoginScreen } from './components/LoginScreen';
+import { LoginScreen } from './components/screen/login/LoginScreen';
 import { TermsScreen } from './components/TermsScreen';
-import { MainScreen } from './components/MainScreen';
-import { VocabularyScreen } from './components/VocabularyScreen';
-import { PracticeScreen } from './components/PracticeScreen';
-import { ListeningScreen } from './components/ListeningScreen';
-import { StoryScreen } from './components/StoryScreen';
-import { FreeStudyScreen } from './components/FreeStudyScreen';
+import { MainScreen } from './components/screen/main/MainScreen';
+import { VocabularyScreen } from './components/screen/vocabulary/VocabularyScreen';
+import { PracticeScreen } from './components/screen/practice/PracticeScreen';
+import { ListeningScreen } from './components/screen/listening/ListeningScreen';
+import { StoryScreen } from './components/screen/story/StoryScreen';
+import { FreeStudyScreen } from './components/screen/freestudy/FreeStudyScreen';
 import { SettingsScreen } from './components/SettingsScreen';
-import { BottomNavigation } from './components/BottomNavigation';
+import { BottomNavigation } from './components/common/BottomNavigation';
 
 export type Screen = 'login' | 'terms' | 'main' | 'vocabulary' | 'practice' | 'listening' | 'story' | 'free-study' | 'settings';
 

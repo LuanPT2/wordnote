@@ -1,5 +1,5 @@
 import React from 'react';
-import { Screen } from '../App';
+import { Screen } from '../../App';
 
 interface BottomNavigationProps {
   currentScreen: Screen;

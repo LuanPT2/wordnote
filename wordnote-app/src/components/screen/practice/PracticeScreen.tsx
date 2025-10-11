@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Input } from './ui/input';
-import { Badge } from './ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Checkbox } from './ui/checkbox';
-import { Progress } from './ui/progress';
+import { Button } from '../../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
+import { Input } from '../../ui/input';
+import { Badge } from '../../ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
+import { Checkbox } from '../../ui/checkbox';
+import { Progress } from '../../ui/progress';
 import { ChevronLeft, ChevronRight, Play, Pause, Settings, Eye, EyeOff, ChevronDown, ChevronUp, BookOpen, Search } from 'lucide-react';
-import { CategoryManagerModal } from './modal/CategoryModal/CategoryManagerModal';
-import { Slider } from './ui/slider';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
-import { TopicSelector } from './common/TopicSelector';
-import { CategorySelector } from './common/CategorySelector';
-import { ImageWithFallback } from './figma/ImageWithFallback';
-import { DictionarySearchModal } from './modal/DictionarySearch/DictionarySearchModal';
+import { CategoryManagerModal } from '../../modal/CategoryModal/CategoryManagerModal';
+import { Slider } from '../../ui/slider';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../ui/collapsible';
+import { TopicSelector } from '../../common/TopicSelector';
+import { CategorySelector } from '../../common/CategorySelector';
+import { ImageWithFallback } from '../../figma/ImageWithFallback';
+import { DictionarySearchModal } from '../../modal/DictionarySearch/DictionarySearchModal';
 
 interface PracticeScreenProps {
   onBack: () => void;

@@ -1,16 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Checkbox } from './ui/checkbox';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Button } from '../../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
+import { Badge } from '../../ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
+import { Checkbox } from '../../ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs';
 import { Play, Pause, Volume2, Settings, Eye, EyeOff, ChevronLeft, ChevronRight, BookOpen, Heart, Users, Search } from 'lucide-react';
-import { CategoryManagerModal } from './modal/CategoryModal/CategoryManagerModal';
-import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Progress } from './ui/progress';
-import { Slider } from './ui/slider';
-import { DictionarySearchModal } from './modal/DictionarySearch/DictionarySearchModal';
+import { CategoryManagerModal } from '../../modal/CategoryModal/CategoryManagerModal';
+import { ImageWithFallback } from '../../figma/ImageWithFallback';
+import { Progress } from '../../ui/progress';
+import { Slider } from '../../ui/slider';
+import { DictionarySearchModal } from '../../modal/DictionarySearch/DictionarySearchModal';
 
 interface StoryScreenProps {
   onBack: () => void;
