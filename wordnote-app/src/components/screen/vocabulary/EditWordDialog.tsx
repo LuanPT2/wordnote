@@ -4,6 +4,8 @@ import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
+import { CategorySelector } from '../../common/CategorySelector';
+import { TopicSelector } from '../../common/TopicSelector';
 
 interface Example {
   id: string;
@@ -100,29 +102,27 @@ export function EditWordDialog({ editingItem, onClose, onSave, categories }: Edi
           </div>
           <div>
             <Label htmlFor="category">Danh mục</Label>
-            <Select
-              value={formData.category}
-              onValueChange={(value) => handleInputChange('category', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn danh mục" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <CategorySelector
+              selectedCategories={formData.category ? [formData.category] : []}
+              onSelectionChange={(selectedCategories) => {
+                if (selectedCategories.length > 0) {
+                  handleInputChange('category', selectedCategories[0]);
+                }
+              }}
+              title="Chọn danh mục cho từ vựng"
+              description="Chọn một danh mục để phân loại từ vựng này"
+            />
           </div>
           <div>
             <Label htmlFor="topic">Chủ đề</Label>
-            <Input
-              id="topic"
-              value={formData.topic}
-              onChange={(e) => handleInputChange('topic', e.target.value)}
-              placeholder="Nhập chủ đề"
+            <TopicSelector
+              type="topic"
+              selectedItems={formData.topic ? [formData.topic] : []}
+              onSelectionChange={(selectedTopics) => {
+                if (selectedTopics.length > 0) {
+                  handleInputChange('topic', selectedTopics[0]);
+                }
+              }}
             />
           </div>
           <div>

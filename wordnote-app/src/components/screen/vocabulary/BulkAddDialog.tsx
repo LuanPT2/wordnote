@@ -5,6 +5,8 @@ import { Textarea } from '../../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 import { Plus } from 'lucide-react';
 import { VocabularyItem } from './VocabularyScreen';
+import { CategorySelector } from '../../common/CategorySelector';
+import { TopicSelector } from '../../common/TopicSelector';
 
 interface BulkAddDialogProps {
   categories: string[];
@@ -15,6 +17,8 @@ interface BulkAddDialogProps {
 export function BulkAddDialog({ categories, setVocabularyList, setCategories }: BulkAddDialogProps) {
   const [showBulkDialog, setShowBulkDialog] = useState(false);
   const [bulkText, setBulkText] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedTopic, setSelectedTopic] = useState<string>('');
   const [suggestedWords] = useState<string[]>([
     'enchanting', 'mystical', 'wondrous', 'magical', 'spellbinding'
   ]);
@@ -36,8 +40,8 @@ export function BulkAddDialog({ categories, setVocabularyList, setCategories }: 
           pronunciation,
           meaning,
           examples: [],
-          category: categories[0] || 'Harry Potter',
-          topic: 'general',
+          category: selectedCategory || categories[0] || 'Harry Potter',
+          topic: selectedTopic || 'general',
           difficulty: 'medium',
           dateAdded: new Date().toISOString().split('T')[0],
           mastered: false,
@@ -98,30 +102,27 @@ export function BulkAddDialog({ categories, setVocabularyList, setCategories }: 
           </div>
 
           <div className="grid grid-cols-3 gap-4">
-            <Select 
-              value={categories[0]} 
-              onValueChange={(value) => setCategories([value, ...categories.filter(c => c !== value)])}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Danh mục" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>{category}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select defaultValue="general">
-              <SelectTrigger>
-                <SelectValue placeholder="Chủ đề" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="general">Tổng quát</SelectItem>
-                <SelectItem value="academic">Học thuật</SelectItem>
-                <SelectItem value="business">Kinh doanh</SelectItem>
-                <SelectItem value="advanced">Nâng cao</SelectItem>
-              </SelectContent>
-            </Select>
+            <CategorySelector
+              selectedCategories={selectedCategory ? [selectedCategory] : []}
+              onSelectionChange={(selectedCategories) => {
+                if (selectedCategories.length > 0) {
+                  setSelectedCategory(selectedCategories[0]);
+                }
+              }}
+              title="Chọn danh mục cho từ vựng"
+              description="Chọn danh mục để phân loại các từ vựng được thêm"
+              className="w-full"
+            />
+            <TopicSelector
+              type="topic"
+              selectedItems={selectedTopic ? [selectedTopic] : []}
+              onSelectionChange={(selectedTopics) => {
+                if (selectedTopics.length > 0) {
+                  setSelectedTopic(selectedTopics[0]);
+                }
+              }}
+              className="w-full"
+            />
             <Select defaultValue="medium">
               <SelectTrigger>
                 <SelectValue placeholder="Độ khó" />
