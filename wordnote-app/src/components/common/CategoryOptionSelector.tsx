@@ -14,9 +14,9 @@ interface CategoryNode extends Category {
   expanded?: boolean;
 }
 
-interface CategorySelectorProps {
-  selectedCategories: string[];
-  onSelectionChange: (categories: string[]) => void;
+interface CategoryOptionSelectorProps {
+  selectedCategory: string;
+  onSelectionChange: (category: string) => void;
   trigger?: React.ReactNode;
   className?: string;
   title?: string;
@@ -24,15 +24,15 @@ interface CategorySelectorProps {
   icon?: React.ReactNode;
 }
 
-export function CategorySelector({ 
-  selectedCategories, 
+export function CategoryOptionSelector({ 
+  selectedCategory, 
   onSelectionChange, 
   trigger,
   className,
   title = "Chọn danh mục",
-  description = "Chọn các danh mục từ vựng mà bạn muốn áp dụng. Bạn có thể mở rộng các thư mục để xem danh mục con.",
+  description = "Chọn một danh mục từ vựng mà bạn muốn áp dụng. Bạn có thể mở rộng các thư mục để xem danh mục con.",
   icon = <Folder className="h-5 w-5 text-blue-600" />
-}: CategorySelectorProps) {
+}: CategoryOptionSelectorProps) {
   const [open, setOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryTree, setCategoryTree] = useState<CategoryNode[]>([]);
@@ -98,12 +98,9 @@ export function CategorySelector({
     setCategoryTree(buildCategoryTree(categories));
   };
 
-  const handleToggle = (categoryName: string) => {
-    if (selectedCategories.includes(categoryName)) {
-      onSelectionChange(selectedCategories.filter(c => c !== categoryName));
-    } else {
-      onSelectionChange([...selectedCategories, categoryName]);
-    }
+  const handleSelect = (categoryName: string) => {
+    onSelectionChange(categoryName);
+    setOpen(false); // Đóng dialog sau khi chọn
   };
 
   const getAllCategoryNames = (nodes: CategoryNode[]): string[] => {
@@ -117,14 +114,6 @@ export function CategorySelector({
     return names;
   };
 
-  const handleSelectAll = () => {
-    const allNames = getAllCategoryNames(categoryTree);
-    onSelectionChange(allNames);
-  };
-
-  const handleDeselectAll = () => {
-    onSelectionChange([]);
-  };
 
   const expandAll = () => {
     const allIds = categories.map(c => c.id);
@@ -141,19 +130,23 @@ export function CategorySelector({
     return nodes.map(node => {
       const hasChildren = node.children.length > 0;
       const isExpanded = expandedCategories.has(node.id);
-      const isSelected = selectedCategories.includes(node.name);
+      const isSelected = selectedCategory === node.name;
       
       return (
         <div key={node.id} className="space-y-1">
           <div 
-            className={`flex items-center space-x-2 p-2 rounded-lg hover:bg-muted/50 transition-colors ${isSelected ? 'bg-primary/5' : ''}`}
+            className={`flex items-center space-x-2 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer ${isSelected ? 'bg-primary/10 border border-primary/20' : ''}`}
             style={{ paddingLeft: `${node.level * 16 + 8}px` }}
+            onClick={() => handleSelect(node.name)}
           >
             {hasChildren ? (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => toggleExpand(node.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleExpand(node.id);
+                }}
                 className="h-6 w-6 p-0 hover:bg-transparent"
               >
                 {isExpanded ? (
@@ -172,18 +165,15 @@ export function CategorySelector({
               <FileText className="h-4 w-4 mr-2 text-muted-foreground" />
             )}
             
-            <Checkbox
-              checked={isSelected}
-              onCheckedChange={() => handleToggle(node.name)}
-              className="data-[state=checked]:bg-primary"
-            />
-            
             <span 
-              className={`text-sm flex-1 cursor-pointer ${isSelected ? 'font-medium text-primary' : 'text-foreground'}`}
-              onClick={() => handleToggle(node.name)}
+              className={`text-sm flex-1 ${isSelected ? 'font-medium text-primary' : 'text-foreground'}`}
             >
               {node.name}
             </span>
+            
+            {isSelected && (
+              <div className="w-2 h-2 bg-primary rounded-full" />
+            )}
           </div>
           
           {hasChildren && isExpanded && (
@@ -199,12 +189,7 @@ export function CategorySelector({
   const defaultTrigger = (
     <Button variant="outline" className={`justify-between ${className}`}>
       <span>
-        {selectedCategories.length === 0 
-          ? 'Chọn danh mục'
-          : selectedCategories.length === getAllCategoryNames(categoryTree).length
-          ? 'Tất cả danh mục'
-          : `${selectedCategories.length} danh mục`
-        }
+        {selectedCategory || 'Chọn danh mục'}
       </span>
       <ChevronDown className="h-4 w-4" />
     </Button>
@@ -227,31 +212,8 @@ export function CategorySelector({
         </DialogHeader>
         
         <div className="space-y-4">
-          {/* Quick actions */}
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleSelectAll}
-              className="flex-1 bg-green-500 text-white border-green-500 hover:bg-green-600 hover:border-green-600 transition-all duration-200"
-            >
-              ✨ Chọn tất cả
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleDeselectAll}
-              className="flex-1 bg-red-500 text-white border-red-500 hover:bg-red-600 hover:border-red-600 transition-all duration-200"
-            >
-              🗑️ Bỏ chọn tất cả
-            </Button>
-          </div>
-
-          {/* Selected count and expand controls */}
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              Đã chọn: {selectedCategories.length}/{getAllCategoryNames(categoryTree).length}
-            </div>
+          {/* Expand controls */}
+          <div className="flex items-center justify-end">
             <div className="flex space-x-2">
               <Button
                 variant="ghost"
@@ -289,30 +251,6 @@ export function CategorySelector({
             </div>
           </ScrollArea>
 
-          {/* Selected badges */}
-          {selectedCategories.length > 0 && (
-            <div className="space-y-2 bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl border border-green-200">
-              <div className="text-sm font-medium text-green-800 flex items-center space-x-2">
-                <span>🎯</span>
-                <span>Danh mục đã chọn:</span>
-              </div>
-              <ScrollArea className="max-h-24">
-                <div className="flex flex-wrap gap-2">
-                  {selectedCategories.map((category) => (
-                    <Badge 
-                      key={category} 
-                      variant="secondary"
-                      className="cursor-pointer bg-green-500 text-white hover:bg-red-500 transition-all duration-200 transform hover:scale-105"
-                      onClick={() => handleToggle(category)}
-                    >
-                      {category} ✕
-                    </Badge>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
-          )}
-
           <div className="flex justify-end space-x-2">
             <Button variant="outline" onClick={() => setOpen(false)}>
               Hủy
@@ -321,7 +259,7 @@ export function CategorySelector({
               onClick={() => setOpen(false)}
               className="bg-blue-500 text-white hover:bg-blue-600"
             >
-              Xong ({selectedCategories.length})
+              Xong
             </Button>
           </div>
         </div>

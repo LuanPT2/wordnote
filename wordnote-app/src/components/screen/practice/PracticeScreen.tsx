@@ -15,6 +15,7 @@ import { TopicSelector } from '../../common/TopicSelector';
 import { CategorySelector } from '../../common/CategorySelector';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
 import { DictionarySearchModal } from '../../modal/DictionarySearch/DictionarySearchModal';
+import { Header } from '../../common/Header';
 
 interface PracticeScreenProps {
   onBack: () => void;
@@ -317,66 +318,30 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
     setShowDictionaryPopup(false);
   };
 
+  const getSubtitle = () => {
+    if (activeTab === 'practice' && selectedWords.length > 0) {
+      return `📖 ${currentIndex + 1}/${selectedWords.length} • ✅ ${Math.round((practiceResults.correct / Math.max(practiceResults.total, 1)) * 100)}% đúng`;
+    } else if (activeTab === 'mynote') {
+      return `📝 ${myNotes.length} ghi chú`;
+    } else {
+      return `📚 ${getFilteredWords().length} từ sẵn sàng`;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header with gradient */}
-      <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-6 shadow-lg">
-        <div className="flex items-center space-x-4">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onBack}
-            className="text-white hover:bg-white/20 p-2 rounded-lg transition-colors"
-          >
-            ←
-          </Button>
-          <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-            <span className="text-2xl">🎯</span>
-          </div>
-          <div className="flex-1">
-            <h1 className="text-2xl font-semibold">Luyện tập từ vựng</h1>
-            <p className="text-green-100 text-sm mt-1 flex items-center space-x-2">
-              {activeTab === 'practice' && selectedWords.length > 0 ? (
-                <>
-                  <span>📖 {currentIndex + 1}/{selectedWords.length}</span>
-                  <span>•</span>
-                  <span>✅ {Math.round((practiceResults.correct / Math.max(practiceResults.total, 1)) * 100)}% đúng</span>
-                </>
-              ) : activeTab === 'mynote' ? (
-                <span>📝 {myNotes.length} ghi chú</span>
-              ) : (
-                <span>📚 {getFilteredWords().length} từ sẵn sàng</span>
-              )}
-            </p>
-          </div>
-
-          {/* Header Actions */}
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowDictionaryPopup(true)}
-              className="text-white hover:bg-white/20"
-              title="Tra từ điển"
-            >
-              <BookOpen className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowCategoryManager(true)}
-              className="text-white hover:bg-white/20"
-              title="Quản lý danh mục"
-            >
-              <img
-                src="https://unpkg.com/heroicons@2.1.1/24/outline/folder.svg"
-                alt="Categories"
-                className="h-5 w-5 invert"
-              />
-            </Button>
-          </div>
-        </div>
-      </div>
+      <Header
+        title="Luyện tập từ vựng"
+        subtitle={getSubtitle()}
+        screenType="practice"
+        onBack={onBack}
+        categories={['Harry Potter', 'Luyện TOEIC', 'Daily', 'New', 'Story']}
+        showDictionaryPopup={showDictionaryPopup}
+        setShowDictionaryPopup={setShowDictionaryPopup}
+        showCategoryManager={showCategoryManager}
+        setShowCategoryManager={setShowCategoryManager}
+        onSaveWord={handleSaveWordFromDictionary}
+      />
 
 
 

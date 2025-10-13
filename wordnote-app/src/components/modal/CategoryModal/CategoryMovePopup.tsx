@@ -4,6 +4,7 @@ import { Badge } from '../../ui/badge';
 import { ScrollArea } from '../../ui/scroll-area';
 import { Folder, MoveRight, X } from 'lucide-react';
 import { VocabularyItem } from '../../../lib/vocabulary-types';
+import { CategoryOptionSelector } from '../../common/CategoryOptionSelector';
 
 interface DropdownOption {
   id: string;
@@ -78,20 +79,26 @@ export function CategoryMovePopup({
             <label className="block text-sm font-medium mb-2">
               Chọn danh mục đích:
             </label>
-            <select
-              value={targetCategoryId}
-              onChange={(e) => onTargetCategoryChange(e.target.value)}
-              className="w-full p-2 border rounded-lg bg-background focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
-            >
-              <option value="">-- Chọn danh mục --</option>
-              {dropdownOptions.map(cat => (
-                <option key={cat.id} value={cat.id}>
-                  {'  '.repeat(cat.level)}
-                  {cat.level > 0 ? '└─ ' : ''}
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+            <CategoryOptionSelector
+              selectedCategory={
+                dropdownOptions.find(cat => cat.id === targetCategoryId)?.name || ''
+              }
+              onSelectionChange={(name) => {
+                const selectedOption = dropdownOptions.find(cat => cat.name === name);
+                if (selectedOption) {
+                  onTargetCategoryChange(selectedOption.id);
+                }
+              }}
+              trigger={
+                <Button variant="outline" className="w-full justify-between">
+                  <span>
+                    {dropdownOptions.find(cat => cat.id === targetCategoryId)?.name || 'Chọn danh mục'}
+                  </span>
+                  <Folder className="h-4 w-4" />
+                </Button>
+              }
+              className="w-full"
+            />
           </div>
 
           <div className="flex space-x-2">
@@ -117,5 +124,3 @@ export function CategoryMovePopup({
 }
 
 export default CategoryMovePopup;
-
-

@@ -1,18 +1,14 @@
-
 import React, { useState } from 'react';
 import { Button } from '../../ui/button';
 import { Card, CardContent } from '../../ui/card';
-import { Input } from '../../ui/input';
 import { Badge } from '../../ui/badge';
-import { BookOpen, Folder, MoreVertical, Edit, Trash2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/dialog';
+import { MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/dropdown-menu';
-import { DictionarySearchModal } from '../../modal/DictionarySearch/DictionarySearchModal';
-import { CategoryManagerModal } from '../../modal/CategoryModal/CategoryManagerModal';
 import { AddWordDialog } from './AddWordModal';
 import { BulkAddDialog } from './BulkAddDialog';
-import { VocabularyFiltersPanel } from './VocabularyFiltersPanel';
+import { VocabularyFilters } from './VocabularyFilters';
 import { EditWordDialog } from './EditWordDialog';
+import { Header } from '../../common/Header'; // Thêm import Header
 
 interface VocabularyScreenProps {
   onBack: () => void;
@@ -343,88 +339,22 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
     setCategories(prev => [...prev, newCategory]);
   };
 
+  const subtitle = `${vocabularyList.length} từ • ${vocabularyList.filter(v => v.mastered).length} đã thuộc`;
+
   return (
     <div className="h-screen bg-background flex flex-col">
-      {/* Header */}
-      <div className="bg-blue-600 text-white p-6 shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onBack}
-              className="text-white hover:bg-white/20 p-2"
-            >
-              ←
-            </Button>
-            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              <span className="text-xl">📝</span>
-            </div>
-            <div>
-              <h1 className="text-xl">Từ vựng</h1>
-              <p className="text-blue-100 text-sm">
-                {vocabularyList.length} từ • {vocabularyList.filter(v => v.mastered).length} đã thuộc
-              </p>
-            </div>
-          </div>
-          
-          {/* Search and Dictionary Icons */}
-          <div className="flex items-center space-x-2">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowDictionaryPopup(true)}
-                  className="text-white hover:bg-white/20"
-                  title="Tra từ điển"
-                >
-                  <BookOpen className="h-5 w-5" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Dictionary Search</DialogTitle>
-                </DialogHeader>
-                <DictionarySearchModal
-                  isOpen={showDictionaryPopup}
-                  onClose={() => setShowDictionaryPopup(false)}
-                  onSaveWord={handleSaveWordFromDictionary}
-                  categories={categories}
-                />
-              </DialogContent>
-            </Dialog>
-            
-            {/* Category Manager */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowCategoryManager(true)}
-                  className="text-white hover:bg-white/20"
-                  title="Quản lý danh mục"
-                >
-                  <img
-                    src="https://unpkg.com/heroicons@2.1.1/24/outline/folder.svg"
-                    alt="Categories"
-                    className="h-5 w-5 invert"
-                  />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Category Manager</DialogTitle>
-                </DialogHeader>
-                <CategoryManagerModal
-                  isOpen={showCategoryManager}
-                  onClose={() => setShowCategoryManager(false)}
-                />
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-      </div>
+      <Header
+        title="Từ vựng"
+        subtitle={subtitle}
+        screenType="vocabulary"
+        onBack={onBack}
+        categories={categories}
+        showDictionaryPopup={showDictionaryPopup}
+        setShowDictionaryPopup={setShowDictionaryPopup}
+        showCategoryManager={showCategoryManager}
+        setShowCategoryManager={setShowCategoryManager}
+        onSaveWord={handleSaveWordFromDictionary}
+      />
 
       <div className="p-6 flex-1 overflow-y-auto">
         {/* Add Word Button */}
@@ -446,7 +376,7 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
 
         {/* Filters - Collapsible */}
         <div className="mb-6 shrink-0">
-          <VocabularyFiltersPanel
+          <VocabularyFilters
             filterCategoryList={filterCategoryList}
             filterTopicList={filterTopicList}
             filterDifficulty={filterDifficulty}

@@ -4,7 +4,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '../../ui/input';
 import { Textarea } from '../../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import { Plus, X } from 'lucide-react';
+import { CategoryManagerModal } from '../../modal/CategoryModal/CategoryManagerModal';
+import { CategoryOptionSelector } from '../../common/CategoryOptionSelector';
+import { Plus, X, Folder } from 'lucide-react';
 
 interface Example {
   id: string;
@@ -35,8 +37,7 @@ interface AddWordDialogProps {
 
 export function AddWordDialog({ categories, onAddWord, onAddCategory }: AddWordDialogProps) {
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [showCategoryDialog, setShowCategoryDialog] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [newWord, setNewWord] = useState({
     word: '',
     pronunciation: '',
@@ -94,14 +95,6 @@ export function AddWordDialog({ categories, onAddWord, onAddCategory }: AddWordD
     });
   };
 
-  const addCategory = () => {
-    if (newCategoryName.trim() && !categories.includes(newCategoryName)) {
-      onAddCategory(newCategoryName);
-      setNewCategoryName('');
-      setShowCategoryDialog(false);
-    }
-  };
-
   return (
     <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
       <DialogTrigger asChild>
@@ -151,39 +144,53 @@ export function AddWordDialog({ categories, onAddWord, onAddCategory }: AddWordD
           </div>
 
           <div>
-            <label className="block text-sm mb-2">Ví dụ</label>
+            <label className="block text-sm mb-2 font-medium text-gray-700">Ví dụ</label>
             <div className="space-y-3">
               {newWord.examples.map((example, index) => (
-                <div key={example.id} className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="text-sm font-medium">Ví dụ {index + 1}</span>
+                <div key={example.id} className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200">
+                  <div className="flex justify-between items-start mb-3">
+                    <span className="text-sm font-medium text-blue-800 flex items-center">
+                      <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs mr-2">
+                        {index + 1}
+                      </span>
+                      Ví dụ {index + 1}
+                    </span>
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => removeExample(example.id)}
-                      className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                      className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full"
                     >
                       <X className="h-3 w-3" />
                     </Button>
                   </div>
-                  <p className="text-sm italic mb-1">"{example.sentence}"</p>
+                  <p className="text-sm italic mb-2 text-gray-700 bg-white p-2 rounded-lg border-l-4 border-blue-400">
+                    "{example.sentence}"
+                  </p>
                   {example.translation && (
-                    <p className="text-sm text-muted-foreground">→ {example.translation}</p>
+                    <p className="text-sm text-gray-600 bg-green-50 p-2 rounded-lg border-l-4 border-green-400">
+                      → {example.translation}
+                    </p>
                   )}
                 </div>
               ))}
               
-              <div className="space-y-2">
+              <div className="space-y-3 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200">
+                <div className="flex items-center space-x-2 mb-3">
+                  <span className="text-sm font-medium text-green-800">✨ Thêm ví dụ mới</span>
+                </div>
                 <Input
                   placeholder="Nhập câu ví dụ..."
                   value={currentExample.sentence}
                   onChange={(e) => setCurrentExample({...currentExample, sentence: e.target.value})}
+                  className="border-green-300 focus:border-green-500 focus:ring-green-500"
                 />
                 <Input
                   placeholder="Nhập bản dịch (tùy chọn)..."
                   value={currentExample.translation}
                   onChange={(e) => setCurrentExample({...currentExample, translation: e.target.value})}
+                  className="border-green-300 focus:border-green-500 focus:ring-green-500"
                 />
                 <Button
                   type="button"
@@ -191,7 +198,7 @@ export function AddWordDialog({ categories, onAddWord, onAddCategory }: AddWordD
                   size="sm"
                   onClick={addExample}
                   disabled={!currentExample.sentence.trim()}
-                  className="w-full"
+                  className="w-full bg-green-500 text-white border-green-500 hover:bg-green-600 hover:border-green-600 transition-all duration-200"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Thêm ví dụ
@@ -201,120 +208,79 @@ export function AddWordDialog({ categories, onAddWord, onAddCategory }: AddWordD
           </div>
 
           <div>
-            <label className="block text-sm mb-2">Danh mục</label>
+            <label className="block text-sm mb-2 font-medium text-gray-700">Danh mục</label>
             <div className="flex space-x-2">
-              <Select value={newWord.category} onValueChange={(value) => setNewWord({...newWord, category: value})}>
-                <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Chọn danh mục" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>{category}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
-                <DialogTrigger asChild>
-                  <Button type="button" variant="outline" size="sm">
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Quản lý danh mục</DialogTitle>
-                    <DialogDescription>
-                      Thêm danh mục mới hoặc xóa danh mục hiện có
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm mb-2">Thêm danh mục mới</label>
-                      <Input
-                        placeholder="Tên danh mục..."
-                        value={newCategoryName}
-                        onChange={(e) => setNewCategoryName(e.target.value)}
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm mb-2">Danh mục hiện có</label>
-                      <div className="space-y-2 max-h-32 overflow-y-auto">
-                        {categories.map((category, index) => (
-                          <div key={category} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                            <span className="text-sm">{category}</span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                const newCategories = categories.filter((_, i) => i !== index);
-                                onAddCategory(newCategories[index-1] || categories[0]);
-                              }}
-                              className="h-6 w-6 p-0 text-red-500"
-                            >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end space-x-2">
-                      <Button variant="outline" onClick={() => setShowCategoryDialog(false)}>
-                        Đóng
-                      </Button>
-                      <Button onClick={addCategory} disabled={!newCategoryName.trim()}>
-                        Thêm
-                      </Button>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
+              <CategoryOptionSelector
+                selectedCategory={newWord.category}
+                onSelectionChange={(category) => setNewWord({...newWord, category})}
+                className="flex-1 border-blue-300 focus:border-blue-500 focus:ring-blue-500"
+                icon={<Folder className="h-4 w-4 mr-2 text-blue-600" />}
+              />
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowCategoryModal(true)}
+                className="bg-blue-500 text-white border-blue-500 hover:bg-blue-600 hover:border-blue-600 transition-all duration-200"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm mb-2">Chủ đề</label>
+              <label className="block text-sm mb-2 font-medium text-gray-700">Chủ đề</label>
               <Select value={newWord.topic} onValueChange={(value) => setNewWord({...newWord, topic: value})}>
-                <SelectTrigger>
+                <SelectTrigger className="border-purple-300 focus:border-purple-500 focus:ring-purple-500">
                   <SelectValue placeholder="Chọn chủ đề" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="general">Tổng quát</SelectItem>
-                  <SelectItem value="academic">Học thuật</SelectItem>
-                  <SelectItem value="business">Kinh doanh</SelectItem>
-                  <SelectItem value="advanced">Nâng cao</SelectItem>
+                  <SelectItem value="general">📚 Tổng quát</SelectItem>
+                  <SelectItem value="academic">🎓 Học thuật</SelectItem>
+                  <SelectItem value="business">💼 Kinh doanh</SelectItem>
+                  <SelectItem value="advanced">🚀 Nâng cao</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <label className="block text-sm mb-2">Độ khó</label>
+              <label className="block text-sm mb-2 font-medium text-gray-700">Độ khó</label>
               <Select value={newWord.difficulty} onValueChange={(value) => setNewWord({...newWord, difficulty: value as any})}>
-                <SelectTrigger>
+                <SelectTrigger className="border-orange-300 focus:border-orange-500 focus:ring-orange-500">
                   <SelectValue placeholder="Chọn độ khó" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="easy">Dễ</SelectItem>
-                  <SelectItem value="medium">Trung bình</SelectItem>
-                  <SelectItem value="hard">Khó</SelectItem>
+                  <SelectItem value="easy">🟢 Dễ</SelectItem>
+                  <SelectItem value="medium">🟡 Trung bình</SelectItem>
+                  <SelectItem value="hard">🔴 Khó</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div className="flex justify-end space-x-2 pt-4">
-            <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-              Hủy
+          <div className="flex justify-end space-x-2 pt-6 border-t border-gray-200">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowAddDialog(false)}
+              className="bg-gray-500 text-white border-gray-500 hover:bg-gray-600 hover:border-gray-600 transition-all duration-200"
+            >
+              ❌ Hủy
             </Button>
             <Button 
               onClick={handleAddWord} 
               disabled={!newWord.word || !newWord.meaning}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              Thêm từ vựng
+              ✅ Thêm từ vựng
             </Button>
           </div>
         </div>
       </DialogContent>
+      
+      <CategoryManagerModal 
+        isOpen={showCategoryModal} 
+        onClose={() => setShowCategoryModal(false)} 
+      />
     </Dialog>
   );
 }
