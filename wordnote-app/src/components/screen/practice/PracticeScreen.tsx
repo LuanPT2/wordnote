@@ -3,17 +3,22 @@ import { Button } from '../../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Input } from '../../ui/input';
 import { Badge } from '../../ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs';
+import { Tabs, TabsContent } from '../../ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
+import { DifficultyMutiSelector } from '../../common/DifficultyMutiSelector';
+import { StatusStudiesMutiSelector } from '../../common/StatusStudiesMutiSelector';
 import { Checkbox } from '../../ui/checkbox';
 import { Progress } from '../../ui/progress';
 import { ChevronLeft, ChevronRight, Play, Pause, Settings, Eye, EyeOff, ChevronDown, ChevronUp, BookOpen, Search } from 'lucide-react';
 import { CategoryManagerModal } from '../../modal/CategoryModal/CategoryManagerModal';
 import { Slider } from '../../ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../ui/collapsible';
-import { TopicSelector } from '../../common/TopicSelector';
+import { TopicMutiSelector } from '../../common/TopicMutiSelector';
 import { CategorySelector } from '../../common/CategorySelector';
+import { TrainingTypesSelector, TrainingType } from '../../common/TrainingTypesSelector';
+import { VocabularyFilter } from '../../common/VocabularyFilter';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
+import { PracticeRunner } from './PracticeRunner';
 import { DictionarySearchModal } from '../../modal/DictionarySearch/DictionarySearchModal';
 import { Header } from '../../common/Header';
 
@@ -48,6 +53,7 @@ interface PracticeConfig {
 
 export function PracticeScreen({ onBack }: PracticeScreenProps) {
   const [activeTab, setActiveTab] = useState('config');
+  const [trainingTypes, setTrainingTypes] = useState<TrainingType[]>(['listening-fill']);
   const [config, setConfig] = useState<PracticeConfig>({
     speed: 'normal',
     categories: [],
@@ -346,19 +352,9 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
 
 
       <div className="p-6 bg-gradient-to-b from-muted/30 to-background min-h-screen">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 bg-white/50 backdrop-blur-sm border shadow-sm">
-            <TabsTrigger value="config" className="flex items-center space-x-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <Settings className="h-4 w-4" />
-              <span>Cấu hình</span>
-            </TabsTrigger>
-            <TabsTrigger value="practice" className="flex items-center space-x-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <span>🎯</span>
-              <span>Luyện tập</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="config" className="space-y-6 mt-6">
+        <div className="space-y-6 mt-6">
+          {!isPlaying && (
+            <>
             {/* Settings - Collapsible */}
             <Collapsible open={settingsExpanded} onOpenChange={setSettingsExpanded}>
               <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
@@ -446,7 +442,7 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
               </Card>
             </Collapsible>
 
-            {/* Filter Settings - Collapsible */}
+            {/* Training Types + Filter Settings - Collapsible */}
             <Collapsible open={filtersExpanded} onOpenChange={setFiltersExpanded}>
               <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
                 <CollapsibleTrigger className="w-full">
@@ -456,7 +452,7 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
                         <div className="p-2 bg-purple-100 rounded-lg">
                           <span className="text-purple-600">🔍</span>
                         </div>
-                        <span className="text-lg">Bộ lọc từ vựng</span>
+                        <span className="text-lg">Loại luyện tập & Bộ lọc từ vựng</span>
                       </div>
                       <div className="p-1 hover:bg-muted rounded-md transition-colors">
                         {filtersExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -465,89 +461,25 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
                   </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <CardContent className="space-y-4 pt-0">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm mb-2">Danh mục ({config.categories.length} đã chọn)</label>
-                        <CategorySelector
-                          selectedCategories={config.categories}
-                          onSelectionChange={(items) => setConfig(prev => ({...prev, categories: items}))}
-                          className="w-full"
-                          title="Chọn danh mục luyện tập"
-                          description="Chọn các danh mục từ vựng mà bạn muốn luyện tập"
-                          icon={<span className="text-lg">🎯</span>}
-                        />
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm mb-2">Chủ đề ({config.topics.length} đã chọn)</label>
-                        <TopicSelector
-                          type="topic"
-                          selectedItems={config.topics}
-                          onSelectionChange={(items) => setConfig(prev => ({...prev, topics: items}))}
-                          className="w-full"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm mb-2">Độ khó</label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {['easy', 'medium', 'hard'].map((difficulty) => (
-                          <label key={difficulty} className="flex items-center space-x-2">
-                            <Checkbox
-                              checked={config.difficulties.includes(difficulty)}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setConfig(prev => ({
-                                    ...prev,
-                                    difficulties: [...prev.difficulties, difficulty]
-                                  }));
-                                } else {
-                                  setConfig(prev => ({
-                                    ...prev,
-                                    difficulties: prev.difficulties.filter(d => d !== difficulty)
-                                  }));
-                                }
-                              }}
-                            />
-                            <span className="text-sm">
-                              {difficulty === 'easy' ? 'Dễ' : difficulty === 'medium' ? 'Trung bình' : 'Khó'}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm mb-2">Trạng thái học</label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[
-                          { value: 'mastered', label: 'Đã thuộc' },
-                          { value: 'not-mastered', label: 'Chưa thuộc' }
-                        ].map((status) => (
-                          <label key={status.value} className="flex items-center space-x-2">
-                            <Checkbox
-                              checked={config.masteryStatus.includes(status.value)}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setConfig(prev => ({
-                                    ...prev,
-                                    masteryStatus: [...prev.masteryStatus, status.value]
-                                  }));
-                                } else {
-                                  setConfig(prev => ({
-                                    ...prev,
-                                    masteryStatus: prev.masteryStatus.filter(s => s !== status.value)
-                                  }));
-                                }
-                              }}
-                            />
-                            <span className="text-sm">{status.label}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
+                  <CardContent className="space-y-6 pt-0">
+                    <VocabularyFilter
+                      value={{
+                        categories: config.categories,
+                        topics: config.topics,
+                        difficulties: config.difficulties as any,
+                        masteryStatus: config.masteryStatus as any,
+                      }}
+                      onChange={(v) => setConfig(prev => ({
+                        ...prev,
+                        categories: v.categories,
+                        topics: v.topics,
+                        difficulties: v.difficulties,
+                        masteryStatus: v.masteryStatus,
+                      }))}
+                      categoryTitle="Chọn danh mục luyện tập"
+                      categoryDescription="Chọn các danh mục từ vựng mà bạn muốn luyện tập"
+                      categoryIcon={<span className="text-lg">🎯</span>}
+                    />
                   </CardContent>
                 </CollapsibleContent>
               </Card>
@@ -680,6 +612,15 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
               </Card>
             </Collapsible>
 
+            {/* Training Types - Outside of collapsed sections */}
+            <div className="pt-2">
+              <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+                <CardContent className="pt-4">
+                  <TrainingTypesSelector selected={trainingTypes} onChange={setTrainingTypes} />
+                </CardContent>
+              </Card>
+            </div>
+
             {/* Start Practice Button - Outside of collapsed sections */}
             <div className="pt-6">
               <Card className="border-0 shadow-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white overflow-hidden">
@@ -705,181 +646,10 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
+            </>
+          )}
 
-          <TabsContent value="practice" className="space-y-6 mt-6">
-            {selectedWords.length === 0 ? (
-              <Card>
-                <CardContent className="text-center p-12">
-                  <div className="text-6xl mb-4">🎯</div>
-                  <h3 className="mb-2">Chưa chọn từ để luyện</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Hãy quay lại tab Cấu hình để chọn từ
-                  </p>
-                  <Button onClick={() => setActiveTab('config')}>
-                    Chọn từ vựng
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <>
-                {/* Progress */}
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm">Tiến độ: {currentIndex + 1}/{selectedWords.length}</span>
-                      <span className="text-sm">Đúng: {practiceResults.correct}/{practiceResults.total}</span>
-                    </div>
-                    <Progress value={(currentIndex / selectedWords.length) * 100} className="mb-2" />
-                  </CardContent>
-                </Card>
-
-                {/* Current Word */}
-                <Card>
-                  <CardContent className="p-8 text-center">
-                    <div className="space-y-6">
-                      {/* Word Image */}
-                      <div className="w-64 h-48 mx-auto rounded-lg overflow-hidden bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-                        <ImageWithFallback
-                          src={`https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80`}
-                          alt={selectedWords[currentIndex]?.word}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-
-                      {/* Hide/Show Controls */}
-                      <div className="flex justify-center space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setHideEnglish(!hideEnglish)}
-                        >
-                          {hideEnglish ? <Eye className="h-4 w-4 mr-2" /> : <EyeOff className="h-4 w-4 mr-2" />}
-                          {hideEnglish ? 'Hiện' : 'Ẩn'} Tiếng Anh
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setHideMeaning(!hideMeaning)}
-                        >
-                          {hideMeaning ? <Eye className="h-4 w-4 mr-2" /> : <EyeOff className="h-4 w-4 mr-2" />}
-                          {hideMeaning ? 'Hiện' : 'Ẩn'} Nghĩa
-                        </Button>
-                      </div>
-
-                      {!hideEnglish && (
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-center space-x-3">
-                            <h2 className="text-3xl font-bold">{selectedWords[currentIndex]?.word}</h2>
-                            <Button
-                              variant="ghost"
-                              size="lg"
-                              onClick={() => speakWord(selectedWords[currentIndex]?.word)}
-                            >
-                              🔊
-                            </Button>
-                          </div>
-
-                          {config.showPronunciation && selectedWords[currentIndex]?.pronunciation && (
-                            <p className="text-lg text-muted-foreground">
-                              {selectedWords[currentIndex].pronunciation}
-                            </p>
-                          )}
-                        </div>
-                      )}
-
-                      {!hideMeaning && config.showMeaning && (
-                        <p className="text-xl text-blue-600">
-                          {selectedWords[currentIndex]?.meaning}
-                        </p>
-                      )}
-
-                      {!hideMeaning && config.showExamples && selectedWords[currentIndex]?.examples.length > 0 && (
-                        <div className="space-y-2 max-w-2xl mx-auto">
-                          {selectedWords[currentIndex].examples.map((example) => (
-                            <div key={example.id} className="p-3 bg-gray-50 rounded-lg text-left">
-                              {!hideEnglish && (
-                                <p className="italic mb-2">"{example.sentence}"</p>
-                              )}
-                              {!hideMeaning && example.translation && (
-                                <p className="text-sm text-muted-foreground">
-                                  → {example.translation}
-                                </p>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {config.testMode && (
-                        <div className="space-y-3 max-w-md mx-auto">
-                          <Input
-                            placeholder="Nhập từ vựng..."
-                            value={userInput}
-                            onChange={(e) => setUserInput(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' && !showAnswer) {
-                                checkAnswer();
-                              }
-                            }}
-                            disabled={showAnswer}
-                          />
-                          {!showAnswer ? (
-                            <Button onClick={checkAnswer} disabled={!userInput.trim()}>
-                              Kiểm tra
-                            </Button>
-                          ) : (
-                            <div className="space-y-2">
-                              <div className={`p-3 rounded-lg ${
-                                userInput.toLowerCase().trim() === selectedWords[currentIndex]?.word.toLowerCase().trim()
-                                  ? 'bg-green-100 text-green-800'
-                                  : 'bg-red-100 text-red-800'
-                              }`}>
-                                {userInput.toLowerCase().trim() === selectedWords[currentIndex]?.word.toLowerCase().trim()
-                                  ? '✅ Chính xác!'
-                                  : `❌ Sai. Đáp án: ${selectedWords[currentIndex]?.word}`
-                                }
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      <div className="flex items-center justify-between space-x-4">
-                        <Button
-                          variant="outline"
-                          onClick={previousWord}
-                          disabled={currentIndex === 0}
-                        >
-                          <ChevronLeft className="h-4 w-4 mr-2" />
-                          Trước
-                        </Button>
-
-                        <Button
-                          onClick={() => addToMyNotes(selectedWords[currentIndex])}
-                          variant="outline"
-                        >
-                          💾 Lưu MyNote
-                        </Button>
-
-                        <Button
-                          variant="outline"
-                          onClick={nextWord}
-                          disabled={currentIndex === selectedWords.length - 1}
-                        >
-                          Sau
-                          <ChevronRight className="h-4 w-4 ml-2" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </>
-            )}
-          </TabsContent>
-
-
-        </Tabs>
+        </div>
       </div>
 
       {/* Dictionary Search Popup */}

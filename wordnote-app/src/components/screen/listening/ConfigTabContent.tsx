@@ -1,4 +1,4 @@
-// ConfigTabContent.tsx
+// ConfigTabContent.tsx - SAU KHI TÁCH ListeningModeSection
 import React, { useState, useEffect } from 'react';
 import { Checkbox } from '../../ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
@@ -10,9 +10,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../ui/collapsible';
 import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { CategorySelector } from '../../common/CategorySelector';
-import { TopicSelector } from '../../common/TopicSelector';
+import { TopicMutiSelector } from '../../common/TopicMutiSelector';
+import { VocabularyFilter } from '../../common/VocabularyFilter';
 import { DictionarySearchModal } from '../../modal/DictionarySearch/DictionarySearchModal';
 import { CategoryManagerModal } from '../../modal/CategoryModal/CategoryManagerModal';
+import { ListeningModeSection } from './ListeningModeSection'; // ← THÊM IMPORT MỚI
 import { VocabularyItem, ListeningConfig, SavedWordList } from './types';
 
 interface ConfigTabContentProps {
@@ -177,97 +179,13 @@ export function ConfigTabContent({
 
   return (
     <div className="space-y-6">
-      {/* Listening Mode - Collapsible */}
-      <Collapsible open={modeExpanded} onOpenChange={setModeExpanded}>
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-          <CollapsibleTrigger className="w-full">
-            <CardHeader className="pb-3 hover:bg-muted/20 transition-colors rounded-t-lg">
-              <CardTitle className="flex items-center justify-between text-left">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-orange-100 rounded-lg">
-                    <span className="text-orange-600 text-lg">⚙️</span>
-                  </div>
-                  <span className="text-lg">Chế độ nghe</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-muted-foreground">
-                    {config.mode.length} đã chọn
-                  </span>
-                  {modeExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </div>
-              </CardTitle>
-            </CardHeader>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <CardContent className="space-y-4 pt-0">
-              <div>
-                <label className="block text-sm mb-3">Nội dung nghe (có thể chọn nhiều)</label>
-                <div className="space-y-2">
-                  {[
-                    { value: 'word', label: 'Từ vựng' },
-                    { value: 'pronunciation', label: 'Phiên âm' },
-                    { value: 'meaning', label: 'Nghĩa' },
-                    { value: 'examples', label: 'Ví dụ' },
-                    { value: 'example-translation', label: 'Dịch ví dụ' }
-                  ].map((option) => (
-                    <label key={option.value} className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={config.mode.includes(option.value)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setConfig(prev => ({
-                              ...prev,
-                              mode: [...prev.mode, option.value]
-                            }));
-                          } else {
-                            setConfig(prev => ({
-                              ...prev,
-                              mode: prev.mode.filter(m => m !== option.value)
-                            }));
-                          }
-                        }}
-                      />
-                      <span className="text-sm">{option.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm mb-2">Thời gian giữa từ và nghĩa/ví dụ</label>
-                  <Select value={config.pauseBetweenParts.toString()} onValueChange={(value) => setConfig(prev => ({...prev, pauseBetweenParts: parseInt(value)}))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0">Không dừng</SelectItem>
-                      <SelectItem value="1">1 giây</SelectItem>
-                      <SelectItem value="2">2 giây</SelectItem>
-                      <SelectItem value="3">3 giây</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm mb-2">Thời gian giữa các từ</label>
-                  <Select value={config.pauseBetweenWords.toString()} onValueChange={(value) => setConfig(prev => ({...prev, pauseBetweenWords: parseInt(value)}))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 giây</SelectItem>
-                      <SelectItem value="2">2 giây</SelectItem>
-                      <SelectItem value="3">3 giây</SelectItem>
-                      <SelectItem value="5">5 giây</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardContent>
-          </CollapsibleContent>
-        </Card>
-      </Collapsible>
+      {/* Listening Mode Section - COMPONENT MỚI */}
+      <ListeningModeSection
+        config={config}
+        setConfig={setConfig}
+        expanded={modeExpanded}
+        onExpandedChange={setModeExpanded}
+      />
 
       {/* Filters - Collapsible */}
       <Collapsible open={filtersExpanded} onOpenChange={setFiltersExpanded}>
@@ -289,88 +207,24 @@ export function ConfigTabContent({
           </CollapsibleTrigger>
           <CollapsibleContent>
             <CardContent className="space-y-4 pt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm mb-2">Danh mục ({config.categories.length} đã chọn)</label>
-                  <CategorySelector
-                    selectedCategories={config.categories}
-                    onSelectionChange={(items) => setConfig(prev => ({...prev, categories: items}))}
-                    className="w-full"
-                    title="Chọn danh mục cho bài nghe"
-                    description="Chọn các danh mục từ vựng cho bài luyện nghe của bạn"
-                    icon={<span className="text-lg">🎧</span>}
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm mb-2">Chủ đề ({config.topics.length} đã chọn)</label>
-                  <TopicSelector
-                    type="topic"
-                    selectedItems={config.topics}
-                    onSelectionChange={(items) => setConfig(prev => ({...prev, topics: items}))}
-                    className="w-full"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm mb-2">Độ khó</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {['easy', 'medium', 'hard'].map((difficulty) => (
-                    <label key={difficulty} className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={config.difficulties.includes(difficulty)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setConfig(prev => ({
-                              ...prev,
-                              difficulties: [...prev.difficulties, difficulty]
-                            }));
-                          } else {
-                            setConfig(prev => ({
-                              ...prev,
-                              difficulties: prev.difficulties.filter(d => d !== difficulty)
-                            }));
-                          }
-                        }}
-                      />
-                      <span className="text-sm">
-                        {difficulty === 'easy' ? 'Dễ' : difficulty === 'medium' ? 'Trung bình' : 'Khó'}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm mb-2">Trạng thái học</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { value: 'mastered', label: 'Đã thuộc' },
-                    { value: 'not-mastered', label: 'Chưa thuộc' }
-                  ].map((status) => (
-                    <label key={status.value} className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={config.masteryStatus.includes(status.value)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setConfig(prev => ({
-                              ...prev,
-                              masteryStatus: [...prev.masteryStatus, status.value]
-                            }));
-                          } else {
-                            setConfig(prev => ({
-                              ...prev,
-                              masteryStatus: prev.masteryStatus.filter(s => s !== status.value)
-                            }));
-                          }
-                        }}
-                      />
-                      <span className="text-sm">{status.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
+              <VocabularyFilter
+                value={{
+                  categories: config.categories,
+                  topics: config.topics,
+                  difficulties: config.difficulties as any,
+                  masteryStatus: config.masteryStatus as any,
+                }}
+                onChange={(v) => setConfig(prev => ({
+                  ...prev,
+                  categories: v.categories,
+                  topics: v.topics,
+                  difficulties: v.difficulties,
+                  masteryStatus: v.masteryStatus,
+                }))}
+                categoryTitle="Chọn danh mục cho bài nghe"
+                categoryDescription="Chọn các danh mục từ vựng cho bài luyện nghe của bạn"
+                categoryIcon={<span className="text-lg">🎧</span>}
+              />
             </CardContent>
           </CollapsibleContent>
         </Card>

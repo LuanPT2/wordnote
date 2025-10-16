@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Plus } from 'lucide-react';
 import { VocabularyItem } from './VocabularyScreen';
 import { CategorySelector } from '../../common/CategorySelector';
-import { TopicSelector } from '../../common/TopicSelector';
+import { TopicMutiSelector } from '../../common/TopicMutiSelector';
 
 interface BulkAddDialogProps {
   categories: string[];
@@ -113,7 +113,7 @@ export function BulkAddDialog({ categories, setVocabularyList, setCategories }: 
               description="Chọn danh mục để phân loại các từ vựng được thêm"
               className="w-full"
             />
-            <TopicSelector
+            <TopicMutiSelector
               type="topic"
               selectedItems={selectedTopic ? [selectedTopic] : []}
               onSelectionChange={(selectedTopics) => {

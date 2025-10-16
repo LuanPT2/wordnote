@@ -4,6 +4,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '../../ui/input';
 import { Textarea } from '../../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
+import { TopicSelector } from '../../common/TopicSelector';
+import { DifficultySelector } from '../../common/DifficultySelector';
 import { CategoryManagerModal } from '../../modal/CategoryModal/CategoryManagerModal';
 import { CategoryOptionSelector } from '../../common/CategoryOptionSelector';
 import { Plus, X, Folder } from 'lucide-react';
@@ -229,33 +231,14 @@ export function AddWordDialog({ categories, onAddWord, onAddCategory }: AddWordD
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm mb-2 font-medium text-gray-700">Chủ đề</label>
-              <Select value={newWord.topic} onValueChange={(value) => setNewWord({...newWord, topic: value})}>
-                <SelectTrigger className="border-purple-300 focus:border-purple-500 focus:ring-purple-500">
-                  <SelectValue placeholder="Chọn chủ đề" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="general">📚 Tổng quát</SelectItem>
-                  <SelectItem value="academic">🎓 Học thuật</SelectItem>
-                  <SelectItem value="business">💼 Kinh doanh</SelectItem>
-                  <SelectItem value="advanced">🚀 Nâng cao</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm mb-2 font-medium text-gray-700">Độ khó</label>
-              <Select value={newWord.difficulty} onValueChange={(value) => setNewWord({...newWord, difficulty: value as any})}>
-                <SelectTrigger className="border-orange-300 focus:border-orange-500 focus:ring-orange-500">
-                  <SelectValue placeholder="Chọn độ khó" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="easy">🟢 Dễ</SelectItem>
-                  <SelectItem value="medium">🟡 Trung bình</SelectItem>
-                  <SelectItem value="hard">🔴 Khó</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <TopicSelector 
+              value={newWord.topic}
+              onChange={(value) => setNewWord({ ...newWord, topic: value })}
+            />
+            <DifficultySelector 
+              value={newWord.difficulty as any}
+              onChange={(value) => setNewWord({ ...newWord, difficulty: value as any })}
+            />
           </div>
 
           <div className="flex justify-end space-x-2 pt-6 border-t border-gray-200">

@@ -18,7 +18,7 @@ import {
   CollapsibleTrigger
 } from '../../ui/collapsible';
 import { Filter, ChevronDown, ChevronUp } from 'lucide-react';
-import { TopicSelector } from '../../common/TopicSelector';
+import { TopicMutiSelector } from '../../common/TopicMutiSelector';
 import { CategorySelector } from '../../common/CategorySelector';
 import clsx from 'clsx';
 
@@ -111,7 +111,7 @@ export function VocabularyFilters({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Chủ đề</label>
-            <TopicSelector
+            <TopicMutiSelector
               type="topic"
               selectedItems={filterTopicList}
               onSelectionChange={setFilterTopicList}

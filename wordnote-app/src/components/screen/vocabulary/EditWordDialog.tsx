@@ -5,7 +5,7 @@ import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 import { CategorySelector } from '../../common/CategorySelector';
-import { TopicSelector } from '../../common/TopicSelector';
+import { TopicMutiSelector } from '../../common/TopicMutiSelector';
 
 interface Example {
   id: string;
@@ -115,7 +115,7 @@ export function EditWordDialog({ editingItem, onClose, onSave, categories }: Edi
           </div>
           <div>
             <Label htmlFor="topic">Chủ đề</Label>
-            <TopicSelector
+            <TopicMutiSelector
               type="topic"
               selectedItems={formData.topic ? [formData.topic] : []}
               onSelectionChange={(selectedTopics) => {
