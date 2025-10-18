@@ -40,6 +40,8 @@ interface ListeningFillModeProps {
   setHideEnglish: (v: boolean) => void;
   hideMeaning: boolean;
   setHideMeaning: (v: boolean) => void;
+  hideExamples: boolean;
+  setHideExamples: (v: boolean) => void;
   config: { showPronunciation: boolean; showMeaning: boolean; showExamples: boolean };
   userInput: string;
   setUserInput: (val: string) => void;
@@ -62,6 +64,8 @@ export function ListeningFillMode(props: ListeningFillModeProps) {
     setHideEnglish,
     hideMeaning,
     setHideMeaning,
+    hideExamples,
+    setHideExamples,
     config,
     userInput,
     setUserInput,
@@ -142,6 +146,12 @@ export function ListeningFillMode(props: ListeningFillModeProps) {
                       {hideMeaning ? <Eye className="h-4 w-4 mr-2" /> : <EyeOff className="h-4 w-4 mr-2" />}
                       {hideMeaning ? 'Hiện' : 'Ẩn'} Nghĩa
                     </Button>
+                    {config.showExamples && (
+                      <Button variant="outline" size="sm" onClick={() => setHideExamples(!hideExamples)}>
+                        {hideExamples ? <Eye className="h-4 w-4 mr-2" /> : <EyeOff className="h-4 w-4 mr-2" />}
+                        {hideExamples ? 'Hiện' : 'Ẩn'} Ví dụ
+                      </Button>
+                    )}
                   </div>
 
                   {!hideEnglish && (
@@ -149,11 +159,29 @@ export function ListeningFillMode(props: ListeningFillModeProps) {
                       <div className="flex items-center justify-center space-x-3">
                         <h2 className="text-3xl font-bold">{selectedWords[currentIndex]?.word}</h2>
                       </div>
+                      {config.showPronunciation && selectedWords[currentIndex]?.pronunciation && (
+                        <p className="text-lg text-muted-foreground">
+                          {selectedWords[currentIndex]?.pronunciation}
+                        </p>
+                      )}
                     </div>
                   )}
 
                   {!hideMeaning && (
                     <p className="text-xl text-blue-600">{selectedWords[currentIndex]?.meaning}</p>
+                  )}
+
+                  {config.showExamples && !hideExamples && selectedWords[currentIndex]?.examples?.length > 0 && (
+                    <div className="space-y-3 max-w-2xl mx-auto">
+                      {selectedWords[currentIndex].examples.map((example) => (
+                        <div key={example.id} className="p-4 bg-gray-50 rounded-lg">
+                          <p className="italic mb-2">"{example.sentence}"</p>
+                          {example.translation && (
+                            <p className="text-sm text-muted-foreground">→ {example.translation}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   )}
 
                   <div className="space-y-3 max-w-md mx-auto">

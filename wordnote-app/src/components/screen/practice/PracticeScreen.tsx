@@ -18,7 +18,7 @@ import { CategorySelector } from '../../common/CategorySelector';
 import { TrainingTypesSelector, TrainingType } from '../../common/TrainingTypesSelector';
 import { VocabularyFilter } from '../../common/VocabularyFilter';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
-import { PracticeRunner } from './PracticeRunner';
+import { ListeningFillMode } from './modes/ListeningFillMode';
 import { DictionarySearchModal } from '../../modal/DictionarySearch/DictionarySearchModal';
 import { Header } from '../../common/Header';
 
@@ -74,6 +74,7 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
   // States for practice screen controls
   const [hideEnglish, setHideEnglish] = useState(false);
   const [hideMeaning, setHideMeaning] = useState(false);
+  const [hideExamples, setHideExamples] = useState(false);
   
   // Reading speed (0.1 to 2.0)
   const [readingSpeed, setReadingSpeed] = useState([0.8]);
@@ -647,6 +648,37 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
               </Card>
             </div>
             </>
+          )}
+
+          {isPlaying && (
+            <Tabs value="practice">
+              <ListeningFillMode
+                startPractice={startPractice}
+                setActiveTab={setActiveTab}
+                speakWord={speakWord}
+                addToMyNotes={addToMyNotes}
+                previousWord={previousWord}
+                nextWord={nextWord}
+                checkAnswer={checkAnswer}
+                selectedWords={selectedWords}
+                currentIndex={currentIndex}
+                practiceResults={practiceResults}
+                hideEnglish={hideEnglish}
+                setHideEnglish={setHideEnglish}
+                hideMeaning={hideMeaning}
+                setHideMeaning={setHideMeaning}
+                hideExamples={hideExamples}
+                setHideExamples={setHideExamples}
+                config={{
+                  showPronunciation: config.showPronunciation,
+                  showMeaning: config.showMeaning,
+                  showExamples: config.showExamples,
+                }}
+                userInput={userInput}
+                setUserInput={setUserInput}
+                showAnswer={showAnswer}
+              />
+            </Tabs>
           )}
 
         </div>
