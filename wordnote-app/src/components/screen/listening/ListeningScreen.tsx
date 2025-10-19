@@ -4,11 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Progress } from '../../ui/progress';
 import { Badge } from '../../ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/dialog';
 import { Input } from '../../ui/input';
-import { Play, Pause, SkipForward, SkipBack, Eye, EyeOff, BookOpen } from 'lucide-react';
+import { Play, Pause, SkipForward, SkipBack, Eye, EyeOff, BookOpen, List, Trash2 } from 'lucide-react';
 import { ConfigTabContent } from './ConfigTabContent';
 import { VocabularyItem, ListeningConfig, SavedWordList } from './types';
+import { ListeningTabContent } from './ListeningTabContent';
 
 interface ListeningScreenProps {
   onBack: () => void;
@@ -52,6 +54,9 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
   const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
   // Category manager modal
   const [showCategoryManager, setShowCategoryManager] = useState(false);
+  
+  // Current list state
+  const [currentListId, setCurrentListId] = useState<string | null>(null);
 
   // Mock vocabulary data
   const vocabularyList: VocabularyItem[] = [
@@ -132,6 +137,13 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
     // Start the listening session
     playCurrentWord(wordsToPlay, 0);
   };
+
+  // Auto start listening when switching to listening tab
+  useEffect(() => {
+    if (activeTab === 'listening' && selectedWords.length > 0 && !isPlaying) {
+      startListening();
+    }
+  }, [activeTab, selectedWords.length]);
 
   const playCurrentWord = (wordList: VocabularyItem[], index: number) => {
     if (index >= wordList.length) {
@@ -251,6 +263,34 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
   const handleDictionaryOpen = () => setShowDictionaryPopup(true);
   const handleCategoryManagerOpen = () => setShowCategoryManager(true);
 
+  // Handle list switching
+  const handleSwitchList = (listId: string) => {
+    if (listId === 'new') {
+      setCurrentListId(null);
+      setSelectedWordIds(vocabularyList.map(word => word.id));
+    } else {
+      setCurrentListId(listId);
+      const selectedList = savedLists.find(list => list.id === listId);
+      if (selectedList) {
+        setSelectedWordIds(selectedList.wordIds);
+      }
+    }
+    // Reset listening state when switching lists
+    setIsPlaying(false);
+    setCurrentIndex(0);
+    setProgress(0);
+    setSelectedWords([]);
+  };
+
+  // Delete saved list
+  const deleteSavedList = (listId: string) => {
+    setSavedLists(prev => prev.filter(list => list.id !== listId));
+    if (currentListId === listId) {
+      setCurrentListId(null);
+      setSelectedWordIds(vocabularyList.map(word => word.id));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50">
       {/* Header */}
@@ -308,20 +348,12 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
         </div>
       </div>
 
-      <div className="p-6 bg-gradient-to-b from-muted/30 to-background min-h-screen">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 bg-white/50 backdrop-blur-sm border shadow-sm">
-            <TabsTrigger value="config" className="flex items-center space-x-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <span>⚙️</span>
-              <span>Cấu hình</span>
-            </TabsTrigger>
-            <TabsTrigger value="listening" className="flex items-center space-x-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <span>🎧</span>
-              <span>Luyện nghe</span>
-            </TabsTrigger>
-          </TabsList>
+      <div className="bg-gradient-to-b from-muted/30 to-background min-h-screen">
+       
+        <div className="px-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
 
-          {/* CONFIG TAB - TÁCH RA */}
+            {/* CONFIG TAB - TÁCH RA */}
           <TabsContent value="config" className="space-y-6 mt-6">
             <ConfigTabContent
               config={config}
@@ -345,170 +377,34 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
             />
           </TabsContent>
 
-          {/* LISTENING TAB - GIỮ NGUYÊN */}
-          <TabsContent value="listening" className="space-y-6 mt-6">
-            {selectedWords.length === 0 ? (
-              <Card>
-                <CardContent className="text-center p-12">
-                  <div className="text-6xl mb-4">🎵</div>
-                  <h3 className="mb-2">Chưa chọn từ để nghe</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Hãy quay lại cấu hình để chọn từ
-                  </p>
-                  <Button onClick={() => setActiveTab('config')}>
-                    Cấu hình nghe
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <>
-                {/* Background Image */}
-                <div 
-                  className="relative h-48 rounded-lg overflow-hidden"
-                  style={{
-                    backgroundImage: backgroundImages.length > 0 
-                      ? `url(${backgroundImages[currentImageIndex]})` 
-                      : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                >
-                  <div className="absolute inset-0 bg-black/40" />
-                  <div className="absolute inset-0 flex items-center justify-center text-white text-center">
-                    <div className="space-y-2">
-                      <div className="text-4xl mb-4">🎵</div>
-                      <h2 className="text-2xl font-bold">Đang nghe...</h2>
-                      <p className="text-sm opacity-90">
-                        Thư giãn và tập trung vào từ vựng
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Progress */}
-                <div className="bg-white/80 backdrop-blur p-2 rounded-lg">
-                  <div className="flex items-center justify-between text-xs mb-1">
-                    <span>{currentIndex + 1}/{selectedWords.length}</span>
-                    <span>{Math.round(progress)}%</span>
-                  </div>
-                  <Progress value={progress} className="h-1" />
-                </div>
-
-                {/* Current Word Display */}
-                {selectedWords[currentIndex] && (
-                  <Card>
-                    <CardContent className="p-8 text-center">
-                      <div className="space-y-6">
-                        {showText && (
-                          <div>
-                            <h2 className="text-4xl font-bold mb-2">{selectedWords[currentIndex].word}</h2>
-                            {selectedWords[currentIndex].pronunciation && (
-                              <p className="text-lg text-muted-foreground">
-                                {selectedWords[currentIndex].pronunciation}
-                              </p>
-                            )}
-                          </div>
-                        )}
-
-                        {showTranslation && (
-                          <p className="text-2xl text-blue-600">
-                            {selectedWords[currentIndex].meaning}
-                          </p>
-                        )}
-
-                        {showExamples && selectedWords[currentIndex].examples.length > 0 && (
-                          <div className="space-y-3 max-w-2xl mx-auto">
-                            {selectedWords[currentIndex].examples.map((example) => (
-                              <div key={example.id} className="p-4 bg-gray-50 rounded-lg">
-                                <p className="italic mb-2">"{example.sentence}"</p>
-                                {example.translation && (
-                                  <p className="text-sm text-muted-foreground">
-                                    → {example.translation}
-                                  </p>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                        <div className="flex items-center justify-center space-x-2">
-                          <Badge className={getCategoryColor(selectedWords[currentIndex].category)}>
-                            {selectedWords[currentIndex].category}
-                          </Badge>
-                          <Badge className={getDifficultyColor(selectedWords[currentIndex].difficulty)}>
-                            {selectedWords[currentIndex].difficulty === 'easy' ? 'Dễ' : 
-                             selectedWords[currentIndex].difficulty === 'medium' ? 'TB' : 'Khó'}
-                          </Badge>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Audio Controls */}
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-center space-x-4 mb-6">
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        onClick={previousWord}
-                        disabled={currentIndex === 0}
-                      >
-                        <SkipBack className="h-5 w-5" />
-                      </Button>
-                      
-                      <Button
-                        size="lg"
-                        onClick={togglePlayPause}
-                        className="rounded-full w-16 h-16"
-                      >
-                        {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
-                      </Button>
-                      
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        onClick={nextWord}
-                        disabled={currentIndex === selectedWords.length - 1}
-                      >
-                        <SkipForward className="h-5 w-5" />
-                      </Button>
-                    </div>
-
-                    {/* Display Options */}
-                    <div className="flex justify-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowText(!showText)}
-                      >
-                        {showText ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
-                        {showText ? 'Ẩn' : 'Hiện'} Từ
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowTranslation(!showTranslation)}
-                      >
-                        {showTranslation ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
-                        {showTranslation ? 'Ẩn' : 'Hiện'} Nghĩa
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowExamples(!showExamples)}
-                      >
-                        {showExamples ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
-                        {showExamples ? 'Ẩn' : 'Hiện'} Ví dụ
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </>
-            )}
+          <TabsContent value="listening">
+            <ListeningTabContent
+              selectedWords={selectedWords}
+              currentIndex={currentIndex}
+              progress={progress}
+              isPlaying={isPlaying}
+              showText={showText}
+              showTranslation={showTranslation}
+              showExamples={showExamples}
+              backgroundImages={backgroundImages}
+              currentImageIndex={currentImageIndex}
+              currentListId={currentListId}
+              savedLists={savedLists}
+              setActiveTab={setActiveTab}
+              togglePlayPause={togglePlayPause}
+              nextWord={nextWord}
+              previousWord={previousWord}
+              setShowText={setShowText}
+              setShowTranslation={setShowTranslation}
+              setShowExamples={setShowExamples}
+              handleSwitchList={handleSwitchList}
+              deleteSavedList={deleteSavedList}
+              getDifficultyColor={getDifficultyColor}
+              getCategoryColor={getCategoryColor}
+            />
           </TabsContent>
-        </Tabs>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
