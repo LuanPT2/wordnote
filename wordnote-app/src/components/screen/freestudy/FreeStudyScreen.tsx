@@ -11,22 +11,20 @@ import { Progress } from '../../ui/progress';
 import { DictionarySearchModal } from '../../modal/DictionarySearch/DictionarySearchModal';
 import { TopicSelector } from '../../common/TopicSelector';
 import { DifficultySelector } from '../../common/DifficultySelector';
+import { 
+  getStudyTopics, 
+  getStudyCategories, 
+  getStudyTopicsByCategory,
+  getStudyTopicsByDifficulty,
+  StudyTopic,
+  StudyCategory
+} from '../../../lib/freestudy-data';
 
 interface FreeStudyScreenProps {
   onBack: () => void;
 }
 
-interface StudyTopic {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  category: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  wordCount: number;
-  completedWords: number;
-  subTopics: StudySubTopic[];
-}
+// StudyTopic interface is now imported from freestudy-data.ts
 
 interface StudySubTopic {
   id: string;
@@ -61,175 +59,8 @@ export function FreeStudyScreen({ onBack }: FreeStudyScreenProps) {
   // Category manager modal
   const [showCategoryManager, setShowCategoryManager] = useState(false);
 
-  // Mock study data
-  const studyTopics: StudyTopic[] = [
-    {
-      id: '1',
-      title: 'Động vật và Thú cưng',
-      description: 'Học từ vựng về các loài động vật, thú cưng và đặc điểm của chúng',
-      image: 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=400',
-      category: 'Nature',
-      difficulty: 'easy',
-      wordCount: 45,
-      completedWords: 12,
-      subTopics: [
-        {
-          id: '1-1',
-          title: 'Thú cưng trong nhà',
-          description: 'Chó, mèo và các thú cưng phổ biến',
-          completed: false,
-          words: [
-            {
-              id: '1-1-1',
-              word: 'puppy',
-              pronunciation: '/ˈpʌp.i/',
-              meaning: 'chó con',
-              examples: [
-                { sentence: 'The puppy is playing in the garden.', translation: 'Chú chó con đang chơi trong vườn.' }
-              ],
-              image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=300',
-              difficulty: 'easy',
-              learned: false,
-              inMyNote: false
-            },
-            {
-              id: '1-1-2',
-              word: 'kitten',
-              pronunciation: '/ˈkɪt.ən/',
-              meaning: 'mèo con',
-              examples: [
-                { sentence: 'The kitten is sleeping on the sofa.', translation: 'Chú mèo con đang ngủ trên ghế sofa.' }
-              ],
-              image: 'https://images.unsplash.com/photo-1574144611937-0df059b5ef3e?w=300',
-              difficulty: 'easy',
-              learned: false,
-              inMyNote: false
-            }
-          ]
-        },
-        {
-          id: '1-2',
-          title: 'Động vật hoang dã',
-          description: 'Sư tử, hổ và các động vật hoang dã',
-          completed: false,
-          words: [
-            {
-              id: '1-2-1',
-              word: 'lion',
-              pronunciation: '/ˈlaɪ.ən/',
-              meaning: 'sư tử',
-              examples: [
-                { sentence: 'The lion is the king of the jungle.', translation: 'Sư tử là vua của rừng xanh.' }
-              ],
-              image: 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=300',
-              difficulty: 'medium',
-              learned: false,
-              inMyNote: false
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: '2',
-      title: 'Thực phẩm và Đồ uống',
-      description: 'Từ vựng về các loại thức ăn, đồ uống và cách chế biến',
-      image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400',
-      category: 'Food',
-      difficulty: 'medium',
-      wordCount: 60,
-      completedWords: 8,
-      subTopics: [
-        {
-          id: '2-1',
-          title: 'Trái cây và rau củ',
-          description: 'Các loại trái cây và rau củ thông dụng',
-          completed: false,
-          words: [
-            {
-              id: '2-1-1',
-              word: 'strawberry',
-              pronunciation: '/ˈstrɔː.ber.i/',
-              meaning: 'dâu tây',
-              examples: [
-                { sentence: 'I love eating fresh strawberries.', translation: 'Tôi thích ăn dâu tây tươi.' }
-              ],
-              image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=300',
-              difficulty: 'easy',
-              learned: false,
-              inMyNote: false
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: '3',
-      title: 'Phương tiện giao thông',
-      description: 'Xe cộ, tàu thuyền và các phương tiện di chuyển',
-      image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400',
-      category: 'Transportation',
-      difficulty: 'medium',
-      wordCount: 35,
-      completedWords: 15,
-      subTopics: [
-        {
-          id: '3-1',
-          title: 'Xe cộ trên đường',
-          description: 'Ô tô, xe máy, xe đạp',
-          completed: false,
-          words: [
-            {
-              id: '3-1-1',
-              word: 'bicycle',
-              pronunciation: '/ˈbaɪ.sɪ.kəl/',
-              meaning: 'xe đạp',
-              examples: [
-                { sentence: 'I ride my bicycle to work every day.', translation: 'Tôi đi xe đạp đến công ty mỗi ngày.' }
-              ],
-              image: 'https://images.unsplash.com/photo-1558618411-fcd25c85cd64?w=300',
-              difficulty: 'easy',
-              learned: false,
-              inMyNote: false
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: '4',
-      title: 'Nghề nghiệp và Công việc',
-      description: 'Các nghề nghiệp phổ biến và môi trường làm việc',
-      image: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=400',
-      category: 'Career',
-      difficulty: 'hard',
-      wordCount: 50,
-      completedWords: 20,
-      subTopics: [
-        {
-          id: '4-1',
-          title: 'Nghề nghiệp y tế',
-          description: 'Bác sĩ, y tá, dược sĩ',
-          completed: false,
-          words: [
-            {
-              id: '4-1-1',
-              word: 'physician',
-              pronunciation: '/fɪˈzɪʃ.ən/',
-              meaning: 'bác sĩ khoa nội',
-              examples: [
-                { sentence: 'The physician examined the patient carefully.', translation: 'Bác sĩ khám cho bệnh nhân một cách cẩn thận.' }
-              ],
-              image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=300',
-              difficulty: 'hard',
-              learned: false,
-              inMyNote: false
-            }
-          ]
-        }
-      ]
-    }
-  ];
+  // Get study data from freestudy-data.ts
+  const studyTopics: StudyTopic[] = getStudyTopics();
 
   const getFilteredTopics = () => {
     return studyTopics.filter(topic => 
@@ -290,13 +121,8 @@ export function FreeStudyScreen({ onBack }: FreeStudyScreenProps) {
   };
 
   const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'Nature': return 'bg-green-100 text-green-800';
-      case 'Food': return 'bg-orange-100 text-orange-800';
-      case 'Transportation': return 'bg-blue-100 text-blue-800';
-      case 'Career': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    const categoryData = getStudyCategories().find(c => c.name === category);
+    return categoryData?.color || 'bg-gray-100 text-gray-800';
   };
 
   // Handle saving word from dictionary popup
@@ -755,7 +581,7 @@ export function FreeStudyScreen({ onBack }: FreeStudyScreenProps) {
         isOpen={showDictionaryPopup}
         onClose={() => setShowDictionaryPopup(false)}
         onSaveWord={handleSaveWordFromDictionary}
-        categories={['Nature', 'Food', 'Transportation', 'Career']}
+        categories={getStudyCategories().map(c => c.name)}
       />
       {/* Category Manager Modal */}
       <CategoryManagerModal

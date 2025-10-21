@@ -1,5 +1,5 @@
 // ConfigTabContent.tsx - SAU KHI TÁCH ListeningModeSection
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Checkbox } from '../../ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/dialog';
@@ -16,6 +16,7 @@ import { DictionarySearchModal } from '../../modal/DictionarySearch/DictionarySe
 import { CategoryManagerModal } from '../../modal/CategoryModal/CategoryManagerModal';
 import { ListeningModeSection } from './ListeningModeSection'; // ← THÊM IMPORT MỚI
 import { VocabularyItem, ListeningConfig, SavedWordList } from './types';
+import { getCategories } from '../../../lib/vocabulary-data';
 
 interface ConfigTabContentProps {
   config: ListeningConfig;
@@ -62,7 +63,7 @@ export function ConfigTabContent({
   const [filtersExpanded, setFiltersExpanded] = useState(true);
   const [wordListExpanded, setWordListExpanded] = useState(false);
 
-  const getFilteredWords = () => {
+  const filteredWords = useMemo(() => {
     return vocabularyList.filter(word => {
       const categoryMatch = config.categories.length === 0 || config.categories.includes(word.category);
       const topicMatch = config.topics.length === 0 || config.topics.includes(word.topic);
@@ -73,7 +74,15 @@ export function ConfigTabContent({
       
       return categoryMatch && topicMatch && difficultyMatch && masteryMatch;
     });
-  };
+  }, [vocabularyList, config]);
+
+  const getFilteredWords = () => filteredWords;
+
+  // Update selected word IDs when filtered words change
+  useEffect(() => {
+    const filteredWordIds = filteredWords.map(word => word.id);
+    setSelectedWordIds(filteredWordIds);
+  }, [filteredWords, setSelectedWordIds]);
 
   const getSelectedWords = () => {
     return vocabularyList.filter(word => selectedWordIds.includes(word.id));
@@ -100,7 +109,7 @@ export function ConfigTabContent({
   };
 
   const areAllFilteredSelected = () => {
-    const filteredWordIds = getFilteredWords().map(word => word.id);
+    const filteredWordIds = filteredWords.map(word => word.id);
     return filteredWordIds.length > 0 && filteredWordIds.every(id => selectedWordIds.includes(id));
   };
 
@@ -160,12 +169,8 @@ export function ConfigTabContent({
   };
 
   const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'Harry Potter': return 'bg-red-100 text-red-800';
-      case 'Luyện TOEIC': return 'bg-green-100 text-green-800';
-      case 'Daily': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    const categoryData = getCategories().find(c => c.name === category);
+    return categoryData?.color || 'bg-gray-100 text-gray-800';
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -239,12 +244,12 @@ export function ConfigTabContent({
                 <Checkbox
                   checked={areAllFilteredSelected()}
                   onCheckedChange={toggleSelectAllFiltered}
-                  disabled={getFilteredWords().length === 0}
+                  disabled={filteredWords.length === 0}
                 />
                 <span className="text-base font-medium">Danh sách từ cần nghe</span>
               </div>
               <span className="text-sm text-muted-foreground">
-                {getSelectedWords().length} từ đã chọn
+                {selectedWordIds.length} từ đã chọn
               </span>
             </div>
             <CollapsibleTrigger className="w-full">
@@ -266,7 +271,7 @@ export function ConfigTabContent({
           <CollapsibleContent>
             <CardContent className="space-y-4 pt-0">
               <div className="space-y-2 max-h-80 overflow-y-auto">
-                {getFilteredWords().map((word) => (
+                {filteredWords.map((word) => (
                   <div key={word.id} className="flex items-center space-x-3 p-2 border rounded hover:bg-gray-50">
                     <Checkbox
                       checked={selectedWordIds.includes(word.id)}
@@ -291,7 +296,7 @@ export function ConfigTabContent({
                   </div>
                 ))}
                 
-                {getFilteredWords().length === 0 && (
+                {filteredWords.length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">
                     <p>Không có từ vựng phù hợp với bộ lọc.</p>
                   </div>
@@ -321,7 +326,7 @@ export function ConfigTabContent({
                     <div className="text-left">
                       <div>Bắt đầu luyện nghe</div>
                       <div className="text-sm opacity-90">
-                        {getSelectedWords().length > 0 ? `${getSelectedWords().length} từ đã chọn` : 'Chọn từ vựng để bắt đầu'}
+                        {selectedWordIds.length > 0 ? `${selectedWordIds.length} từ đã chọn` : 'Chọn từ vựng để bắt đầu'}
                       </div>
                     </div>
                   </div>

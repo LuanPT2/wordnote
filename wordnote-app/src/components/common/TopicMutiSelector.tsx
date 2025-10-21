@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from '../ui/badge';
 import { ChevronDown } from 'lucide-react';
 import clsx from 'clsx';
+import { getCategories, getTopics } from '../../lib/vocabulary-data';
 
 interface TopicMutiSelectorProps {
   type: 'category' | 'topic';
@@ -22,8 +23,11 @@ export function TopicMutiSelector({
 }: TopicMutiSelectorProps) {
   const [open, setOpen] = useState(false);
   
-  const categories = ['Harry Potter', 'Luyện TOEIC', 'Daily', 'New', 'Business', 'Story'];
-  const topics = ['tổng quát', 'học thuật', 'kinh doanh', 'nâng cao'];
+  const categoriesData = getCategories();
+  const topicsData = getTopics();
+  
+  const categories = categoriesData.map(c => c.name);
+  const topics = topicsData.map(t => t.name);
   
   const items = type === 'category' ? categories : topics;
   const title = type === 'category' ? 'Chọn danh mục' : 'Chọn chủ đề';
@@ -102,6 +106,11 @@ export function TopicMutiSelector({
             <div className="grid grid-cols-2 gap-2">
               {items.map((item) => {
                 const isSelected = selectedItems.includes(item);
+                const itemData = type === 'category' 
+                  ? categoriesData.find(c => c.name === item)
+                  : topicsData.find(t => t.name === item);
+                const displayName = itemData?.description || item;
+                
                 return (
                   <button
                     key={item}
@@ -113,7 +122,7 @@ export function TopicMutiSelector({
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'
                     )}
                   >
-                    {item}
+                    {displayName}
                   </button>
                 );
               })}
@@ -128,16 +137,23 @@ export function TopicMutiSelector({
                 <span>Đã chọn:</span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {selectedItems.map((item) => (
-                  <Badge 
-                    key={item} 
-                    variant="secondary"
-                    className="cursor-pointer bg-blue-500 text-white hover:bg-red-500 transition-all duration-200 transform hover:scale-105"
-                    onClick={() => handleToggle(item)}
-                  >
-                    {item} ✕
-                  </Badge>
-                ))}
+                {selectedItems.map((item) => {
+                  const itemData = type === 'category' 
+                    ? categoriesData.find(c => c.name === item)
+                    : topicsData.find(t => t.name === item);
+                  const displayName = itemData?.description || item;
+                  
+                  return (
+                    <Badge 
+                      key={item} 
+                      variant="secondary"
+                      className="cursor-pointer bg-blue-500 text-white hover:bg-red-500 transition-all duration-200 transform hover:scale-105"
+                      onClick={() => handleToggle(item)}
+                    >
+                      {displayName} ✕
+                    </Badge>
+                  );
+                })}
               </div>
             </div>
           )}

@@ -596,7 +596,7 @@ export class VocabularyLibrary {
     }
   }
 
-  private seedSampleData(): void {
+  private seedSampleData2(): void {
     // Only seed if there's very little data
     if (this.vocabulary.length > 10) return;
 

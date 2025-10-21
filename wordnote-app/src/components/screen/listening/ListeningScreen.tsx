@@ -11,6 +11,15 @@ import { Play, Pause, SkipForward, SkipBack, Eye, EyeOff, BookOpen, List, Trash2
 import { ConfigTabContent } from './ConfigTabContent';
 import { VocabularyItem, ListeningConfig, SavedWordList } from './types';
 import { ListeningTabContent } from './ListeningTabContent';
+import { 
+  getVocabularyList, 
+  getCategories, 
+  getTopics,
+  getVocabularyByCategory,
+  getVocabularyByTopic,
+  getVocabularyByDifficulty,
+  getVocabularyByMastered
+} from '../../../lib/vocabulary-data';
 
 interface ListeningScreenProps {
   onBack: () => void;
@@ -58,51 +67,10 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
   // Current list state
   const [currentListId, setCurrentListId] = useState<string | null>(null);
 
-  // Mock vocabulary data
-  const vocabularyList: VocabularyItem[] = [
-    {
-      id: '1',
-      word: 'serendipity',
-      pronunciation: '/ˌser.ənˈdɪp.ə.ti/',
-      meaning: 'may mắn tình cờ, sự tình cờ may mắn',
-      examples: [
-        { id: '1-1', sentence: 'It was pure serendipity that we met at the coffee shop.', translation: 'Thật là may mắn tình cờ khi chúng ta gặp nhau ở quán cà phê.' }
-      ],
-      category: 'Harry Potter',
-      topic: 'advanced',
-      difficulty: 'hard',
-      mastered: false
-    },
-    {
-      id: '2',
-      word: 'fascinating',
-      pronunciation: '/ˈfæs.ɪ.neɪ.tɪŋ/',
-      meaning: 'hấp dẫn, lôi cuốn',
-      examples: [
-        { id: '2-1', sentence: 'The documentary about space was absolutely fascinating.', translation: 'Bộ phim tài liệu về vũ trụ thực sự rất hấp dẫn.' }
-      ],
-      category: 'Luyện TOEIC',
-      topic: 'general',
-      difficulty: 'medium',
-      mastered: true
-    },
-    {
-      id: '3',
-      word: 'ambiguous',
-      pronunciation: '/æmˈbɪɡ.ju.əs/',
-      meaning: 'mơ hồ, không rõ ràng',
-      examples: [
-        { id: '3-1', sentence: 'His answer was ambiguous and difficult to understand.', translation: 'Câu trả lời của anh ấy mơ hồ và khó hiểu.' }
-      ],
-      category: 'Daily',
-      topic: 'academic',
-      difficulty: 'hard',
-      mastered: false
-    }
-  ];
-
-  const categories = ['Harry Potter', 'Luyện TOEIC', 'Daily', 'New'];
-  const topics = ['general', 'academic', 'business', 'advanced'];
+  // Get vocabulary data from vocabulary-data.ts
+  const vocabularyList: VocabularyItem[] = getVocabularyList();
+  const categories = getCategories().map(c => c.name);
+  const topics = getTopics().map(t => t.name);
 
   // Mock background images
   useEffect(() => {
@@ -252,12 +220,8 @@ export function ListeningScreen({ onBack }: ListeningScreenProps) {
   };
 
   const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'Harry Potter': return 'bg-red-100 text-red-800';
-      case 'Luyện TOEIC': return 'bg-green-100 text-green-800';
-      case 'Daily': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    const categoryData = getCategories().find(c => c.name === category);
+    return categoryData?.color || 'bg-gray-100 text-gray-800';
   };
 
   const handleDictionaryOpen = () => setShowDictionaryPopup(true);

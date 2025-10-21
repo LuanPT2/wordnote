@@ -10,6 +10,7 @@ import { Plus, X, Filter, SortAsc, BookOpen, Search } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { DictionarySearchModal } from './modal/DictionarySearch/DictionarySearchModal';
 import { CategoryManagerModal } from './modal/CategoryModal/CategoryManagerModal';
+import { getCategories } from '../lib/vocabulary-data';
 
 interface VocabularyNoteScreenProps {
   onBack: () => void;
@@ -61,9 +62,7 @@ export function VocabularyNoteScreen({ onBack }: VocabularyNoteScreenProps) {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [categories, setCategories] = useState([
     'Tất cả',
-    'Harry Potter',
-    'Luyện TOEIC',
-    'Daily Conversation'
+    ...getCategories().map(c => c.name)
   ]);
 
   // Example management
@@ -228,12 +227,8 @@ export function VocabularyNoteScreen({ onBack }: VocabularyNoteScreenProps) {
   };
 
   const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'Harry Potter': return 'bg-red-100 text-red-800';
-      case 'Luyện TOEIC': return 'bg-green-100 text-green-800';
-      case 'Daily Conversation': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    const categoryData = getCategories().find(c => c.name === category);
+    return categoryData?.color || 'bg-gray-100 text-gray-800';
   };
 
   // Handle saving word from dictionary popup

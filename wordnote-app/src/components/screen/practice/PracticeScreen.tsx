@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '../../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Input } from '../../ui/input';
@@ -18,6 +18,7 @@ import { CategorySelector } from '../../common/CategorySelector';
 import { TrainingTypesSelector, TrainingType } from '../../common/TrainingTypesSelector';
 import { VocabularyFilter } from '../../common/VocabularyFilter';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
+import { getCategories, getTopics, getVocabularyList, VocabularyItem, addVocabularyItem } from '../../../lib/vocabulary-data';
 import { ListeningFillMode } from './modes/ListeningFillMode';
 import { DictionarySearchModal } from '../../modal/DictionarySearch/DictionarySearchModal';
 import { Header } from '../../common/Header';
@@ -26,18 +27,6 @@ interface PracticeScreenProps {
   onBack: () => void;
 }
 
-interface VocabularyItem {
-  id: string;
-  word: string;
-  pronunciation: string;
-  meaning: string;
-  examples: Array<{id: string, sentence: string, translation: string}>;
-  category: string;
-  topic: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  mastered: boolean;
-  reviewCount: number;
-}
 
 interface PracticeConfig {
   speed: 'slow' | 'normal' | 'fast';
@@ -96,56 +85,13 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
   // Category manager modal
   const [showCategoryManager, setShowCategoryManager] = useState(false);
 
-  // Mock vocabulary data
-  const vocabularyList: VocabularyItem[] = [
-    {
-      id: '1',
-      word: 'serendipity',
-      pronunciation: '/ˌser.ənˈdɪp.ə.ti/',
-      meaning: 'may mắn tình cờ, sự tình cờ may mắn',
-      examples: [
-        { id: '1-1', sentence: 'It was pure serendipity that we met at the coffee shop.', translation: 'Thật là may mắn tình cờ khi chúng ta gặp nhau ở quán cà phê.' }
-      ],
-      category: 'Harry Potter',
-      topic: 'advanced',
-      difficulty: 'hard',
-      mastered: false,
-      reviewCount: 3
-    },
-    {
-      id: '2',
-      word: 'fascinating',
-      pronunciation: '/ˈfæs.ɪ.neɪ.tɪŋ/',
-      meaning: 'hấp dẫn, lôi cuốn',
-      examples: [
-        { id: '2-1', sentence: 'The documentary about space was absolutely fascinating.', translation: 'Bộ phim tài liệu về vũ trụ thực sự rất hấp dẫn.' }
-      ],
-      category: 'Luyện TOEIC',
-      topic: 'general',
-      difficulty: 'medium',
-      mastered: true,
-      reviewCount: 8
-    },
-    {
-      id: '3',
-      word: 'ambiguous',
-      pronunciation: '/æmˈbɪɡ.ju.əs/',
-      meaning: 'mơ hồ, không rõ ràng',
-      examples: [
-        { id: '3-1', sentence: 'His answer was ambiguous and difficult to understand.', translation: 'Câu trả lời của anh ấy mơ hồ và khó hiểu.' }
-      ],
-      category: 'Daily',
-      topic: 'academic',
-      difficulty: 'hard',
-      mastered: false,
-      reviewCount: 2
-    }
-  ];
+  // Get vocabulary data from vocabulary-data.ts
+  const vocabularyList: VocabularyItem[] = getVocabularyList();
 
-  const categories = ['Harry Potter', 'Luyện TOEIC', 'Daily', 'New'];
-  const topics = ['general', 'academic', 'business', 'advanced'];
+  const categories = getCategories().map(c => c.name);
+  const topics = getTopics().map(t => t.name);
 
-  const getFilteredWords = () => {
+  const filteredWords = useMemo(() => {
     return vocabularyList.filter(word => {
       const categoryMatch = config.categories.length === 0 || config.categories.includes(word.category);
       const topicMatch = config.topics.length === 0 || config.topics.includes(word.topic);
@@ -156,13 +102,14 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
       
       return categoryMatch && topicMatch && difficultyMatch && masteryMatch;
     });
-  };
+  }, [vocabularyList, config]);
 
-  // Initialize selected words when component mounts
+  const getFilteredWords = () => filteredWords;
+
+  // Update selected words when filtered words change
   useEffect(() => {
-    const filtered = getFilteredWords();
-    setSelectedWords(filtered);
-  }, []);
+    setSelectedWords(filteredWords);
+  }, [filteredWords]);
 
   const startPractice = () => {
     const filtered = getFilteredWords();
@@ -297,12 +244,8 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
   };
 
   const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'Harry Potter': return 'bg-red-100 text-red-800';
-      case 'Luyện TOEIC': return 'bg-green-100 text-green-800';
-      case 'Daily': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    const categoryData = getCategories().find(c => c.name === category);
+    return categoryData?.color || 'bg-gray-100 text-gray-800';
   };
 
   // Handle saving word from dictionary popup
@@ -316,11 +259,13 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
       category,
       topic: 'general',
       difficulty: 'medium',
+      dateAdded: new Date().toISOString().split('T')[0],
       mastered: false,
       reviewCount: 0
     };
     
-    // Add to vocabulary list (in a real app, this would be saved to backend)
+    // Add to vocabulary list using vocabulary-data.ts
+    addVocabularyItem(newVocabularyItem);
     console.log('Word saved from dictionary:', newVocabularyItem);
     setShowDictionaryPopup(false);
   };
@@ -331,7 +276,7 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
     } else if (activeTab === 'mynote') {
       return `📝 ${myNotes.length} ghi chú`;
     } else {
-      return `📚 ${getFilteredWords().length} từ sẵn sàng`;
+      return `📚 ${filteredWords.length} từ sẵn sàng`;
     }
   };
 
@@ -342,7 +287,7 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
         subtitle={getSubtitle()}
         screenType="practice"
         onBack={onBack}
-        categories={['Harry Potter', 'Luyện TOEIC', 'Daily', 'New', 'Story']}
+        categories={getCategories().map(c => c.name)}
         showDictionaryPopup={showDictionaryPopup}
         setShowDictionaryPopup={setShowDictionaryPopup}
         showCategoryManager={showCategoryManager}
@@ -497,7 +442,7 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
                       </div>
                       <div>
                         <h3 className="text-lg font-medium">Chọn từ để luyện</h3>
-                        <p className="text-sm text-muted-foreground">{getFilteredWords().length} từ phù hợp với bộ lọc</p>
+                        <p className="text-sm text-muted-foreground">{filteredWords.length} từ phù hợp với bộ lọc</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -507,11 +452,10 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
                   </div>
                   <div className="flex items-center space-x-3 mb-2">
                     <Checkbox
-                      checked={selectedWords.length === getFilteredWords().length && getFilteredWords().length > 0}
+                      checked={selectedWords.length === filteredWords.length && filteredWords.length > 0}
                       onCheckedChange={(checked) => {
-                        const filtered = getFilteredWords();
                         if (checked) {
-                          setSelectedWords(filtered);
+                          setSelectedWords(filteredWords);
                         } else {
                           setSelectedWords([]);
                         }
@@ -539,7 +483,7 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
                   <CardContent className="space-y-4 pt-0">
                     {/* Word List - Full Height */}
                     <div className="space-y-3">
-                      {getFilteredWords().map((word) => (
+                      {filteredWords.map((word) => (
                         <Card key={word.id} className="hover:shadow-md transition-shadow">
                           <CardContent className="p-4">
                             <div className="flex items-center justify-between">
@@ -594,7 +538,7 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
                         </Card>
                       ))}
                       
-                      {getFilteredWords().length === 0 && (
+                      {filteredWords.length === 0 && (
                         <Card>
                           <CardContent className="text-center p-8">
                             <div className="text-4xl mb-4">🔍</div>
@@ -689,7 +633,7 @@ export function PracticeScreen({ onBack }: PracticeScreenProps) {
         isOpen={showDictionaryPopup}
         onClose={() => setShowDictionaryPopup(false)}
         onSaveWord={handleSaveWordFromDictionary}
-        categories={['Harry Potter', 'Luyện TOEIC', 'Daily', 'New', 'Story']}
+        categories={getCategories().map(c => c.name)}
       />
       {/* Category Manager Modal */}
       <CategoryManagerModal

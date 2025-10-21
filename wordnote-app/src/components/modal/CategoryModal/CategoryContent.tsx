@@ -18,6 +18,14 @@ import {
 import { vocabularyLibrary } from '../../../lib/vocabulary-library';
 import CategoryMovePopup from './CategoryMovePopup';
 import { Category, VocabularyItem } from '../../../lib/vocabulary-types';
+import { 
+  getVocabularyList, 
+  getCategories, 
+  getVocabularyByCategory,
+  addCategory,
+  updateCategory,
+  deleteCategory
+} from '../../../lib/vocabulary-data';
 
 interface CategoryNode extends Category {
   children: CategoryNode[];
@@ -80,8 +88,8 @@ export function CategoryContent({ onCategorySelect, onVocabularySelect, classNam
   }, [vocabulary, selectedCategory, onVocabularySelect]);
 
   const loadData = () => {
-    const cats = vocabularyLibrary.getCategories();
-    const vocab = vocabularyLibrary.getAllVocabulary();
+    const cats = getCategories();
+    const vocab = getVocabularyList();
     setCategories(cats);
     setVocabulary(vocab);
   };
@@ -134,7 +142,7 @@ export function CategoryContent({ onCategorySelect, onVocabularySelect, classNam
   const handleCreateCategory = () => {
     if (!newCategoryName.trim()) return;
     
-    vocabularyLibrary.addCategory({
+    addCategory({
       name: newCategoryName.trim(),
       color: selectedColor,
       parentId: selectedCategory?.id
@@ -148,7 +156,7 @@ export function CategoryContent({ onCategorySelect, onVocabularySelect, classNam
   const handleEditCategory = () => {
     if (!editCategoryName.trim() || !selectedCategory) return;
     
-    vocabularyLibrary.updateCategory(selectedCategory.id, {
+    updateCategory(selectedCategory.id, {
       name: editCategoryName.trim(),
       color: selectedColor
     });
@@ -177,7 +185,7 @@ export function CategoryContent({ onCategorySelect, onVocabularySelect, classNam
     if (!selectedCategory) return;
     
     if (confirm(`Bạn có chắc chắn muốn xóa danh mục "${selectedCategory.name}"? Tất cả từ vựng trong danh mục này sẽ được chuyển về danh mục gốc.`)) {
-      vocabularyLibrary.deleteCategory(selectedCategory.id);
+      deleteCategory(selectedCategory.id);
       setSelectedCategory(null);
       loadData();
     }
@@ -241,11 +249,12 @@ export function CategoryContent({ onCategorySelect, onVocabularySelect, classNam
     const targetCategory = categories.find(cat => cat.id === targetCategoryForMove);
     if (!targetCategory) return;
 
-    vocabularyLibrary.executeBulkOperation({
-      type: 'move-category',
-      itemIds: Array.from(selectedVocabulary),
-      data: { category: targetCategory.name }
-    });
+    // TODO: Implement bulk operation in vocabulary-data.ts
+    // vocabularyLibrary.executeBulkOperation({
+    //   type: 'move-category',
+    //   itemIds: Array.from(selectedVocabulary),
+    //   data: { category: targetCategory.name }
+    // });
 
     setSelectedVocabulary(new Set());
     setShowMoveDialog(false);

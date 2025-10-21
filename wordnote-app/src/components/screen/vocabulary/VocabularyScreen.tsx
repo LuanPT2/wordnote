@@ -8,7 +8,17 @@ import { AddWordDialog } from './AddWordModal';
 import { BulkAddDialog } from './BulkAddDialog';
 import { VocabularyFilters } from './VocabularyFilters';
 import { EditWordDialog } from './EditWordDialog';
-import { Header } from '../../common/Header'; // Thêm import Header
+import { Header } from '../../common/Header';
+import { 
+  getVocabularyList, 
+  getCategories, 
+  getTopics, 
+  getVocabularyStats,
+  VocabularyItem,
+  addVocabularyItem,
+  updateVocabularyItem,
+  deleteVocabularyItem
+} from '../../../lib/vocabulary-data';
 
 interface VocabularyScreenProps {
   onBack: () => void;
@@ -54,13 +64,7 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
 
   // Category management
   const [showCategoryManager, setShowCategoryManager] = useState(false);
-  const [categories, setCategories] = useState([
-    'Harry Potter',
-    'Luyện TOEIC',
-    'Daily',
-    'New',
-    'Story'
-  ]);
+  const [categories, setCategories] = useState(getCategories().map(c => c.name));
 
   // Edit mode
   const [editingItem, setEditingItem] = useState<VocabularyItem | null>(null);
@@ -68,177 +72,22 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
   // Dictionary popup state
   const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
 
-  const [vocabularyList, setVocabularyList] = useState<VocabularyItem[]>([
-    {
-      id: '1',
-      word: 'serendipity',
-      pronunciation: '/ˌser.ənˈdɪp.ə.ti/',
-      meaning: 'may mắn tình cờ, sự tình cờ may mắn',
-      examples: [
-        { id: '1-1', sentence: 'It was pure serendipity that we met at the coffee shop.', translation: 'Thật là may mắn tình cờ khi chúng ta gặp nhau ở quán cà phê.' }
-      ],
-      category: 'Harry Potter',
-      topic: 'advanced',
-      difficulty: 'hard',
-      dateAdded: '2024-01-15',
-      mastered: false,
-      reviewCount: 3,
-      lastReviewed: '2024-12-14'
-    },
-    {
-      id: '2',
-      word: 'fascinating',
-      pronunciation: '/ˈfæs.ɪ.neɪ.tɪŋ/',
-      meaning: 'hấp dẫn, lôi cuốn',
-      examples: [
-        { id: '2-1', sentence: 'The documentary about space was absolutely fascinating.', translation: 'Bộ phim tài liệu về vũ trụ thực sự rất hấp dẫn.' },
-        { id: '2-2', sentence: 'I find history fascinating.', translation: 'Tôi thấy lịch sử rất thú vị.' }
-      ],
-      category: 'Luyện TOEIC',
-      topic: 'general',
-      difficulty: 'medium',
-      dateAdded: '2024-01-14',
-      mastered: true,
-      reviewCount: 8,
-      lastReviewed: '2024-12-13'
-    },
-    {
-      id: '3',
-      word: 'ambiguous',
-      pronunciation: '/æmˈbɪɡ.ju.əs/',
-      meaning: 'mơ hồ, không rõ ràng',
-      examples: [
-        { id: '3-1', sentence: 'His answer was ambiguous and difficult to understand.', translation: 'Câu trả lời của anh ấy mơ hồ và khó hiểu.' }
-      ],
-      category: 'Daily',
-      topic: 'academic',
-      difficulty: 'hard',
-      dateAdded: '2024-01-13',
-      mastered: false,
-      reviewCount: 2,
-      lastReviewed: '2024-12-15'
-    },
-    {
-      id: '4',
-      word: 'magnificent',
-      pronunciation: '/mæɡˈnɪf.ɪ.sənt/',
-      meaning: 'tráng lệ, hoành tráng',
-      examples: [
-        { id: '4-1', sentence: 'The view from the mountain was magnificent.', translation: 'Khung cảnh từ núi thật tráng lệ.' }
-      ],
-      category: 'Harry Potter',
-      topic: 'general',
-      difficulty: 'medium',
-      dateAdded: '2024-01-12',
-      mastered: true,
-      reviewCount: 12,
-      lastReviewed: '2024-12-12'
-    },
-    {
-      id: '5',
-      word: 'accomplish',
-      pronunciation: '/əˈkʌm.plɪʃ/',
-      meaning: 'hoàn thành, đạt được',
-      examples: [
-        { id: '5-1', sentence: 'She managed to accomplish all her goals this year.', translation: 'Cô ấy đã hoàn thành tất cả mục tiêu trong năm này.' }
-      ],
-      category: 'Luyện TOEIC',
-      topic: 'business',
-      difficulty: 'medium',
-      dateAdded: '2024-01-11',
-      mastered: false,
-      reviewCount: 5,
-      lastReviewed: '2024-12-11'
-    },
-    {
-      id: '6',
-      word: 'perseverance',
-      pronunciation: '/ˌpɜː.sɪˈvɪə.rəns/',
-      meaning: 'sự kiên trì, bền bỉ',
-      examples: [
-        { id: '6-1', sentence: 'Success requires talent and perseverance.', translation: 'Thành công đòi hỏi tài năng và sự kiên trì.' }
-      ],
-      category: 'Daily',
-      topic: 'general',
-      difficulty: 'hard',
-      dateAdded: '2024-01-10',
-      mastered: true,
-      reviewCount: 7,
-      lastReviewed: '2024-12-10'
-    },
-    {
-      id: '7',
-      word: 'delightful',
-      pronunciation: '/dɪˈlaɪt.fəl/',
-      meaning: 'thú vị, dễ thương',
-      examples: [
-        { id: '7-1', sentence: 'The garden party was absolutely delightful.', translation: 'Bữa tiệc trong vườn thật sự rất thú vị.' }
-      ],
-      category: 'Story',
-      topic: 'general',
-      difficulty: 'easy',
-      dateAdded: '2024-01-09',
-      mastered: true,
-      reviewCount: 10,
-      lastReviewed: '2024-12-09'
-    },
-    {
-      id: '8',
-      word: 'entrepreneur',
-      pronunciation: '/ˌɒn.trə.prəˈnɜːr/',
-      meaning: 'doanh nhân, người khởi nghiệp',
-      examples: [
-        { id: '8-1', sentence: 'Every successful entrepreneur faces challenges.', translation: 'Mọi doanh nhân thành công đều phải đối mặt với thử thách.' }
-      ],
-      category: 'Luyện TOEIC',
-      topic: 'business',
-      difficulty: 'hard',
-      dateAdded: '2024-01-08',
-      mastered: false,
-      reviewCount: 3,
-      lastReviewed: '2024-12-08'
-    },
-    {
-      id: '9',
-      word: 'extraordinary',
-      pronunciation: '/ɪkˈstrɔː.dɪn.ər.i/',
-      meaning: 'phi thường, đặc biệt',
-      examples: [
-        { id: '9-1', sentence: 'She has an extraordinary talent for music.', translation: 'Cô ấy có tài năng phi thường về âm nhạc.' }
-      ],
-      category: 'Harry Potter',
-      topic: 'advanced',
-      difficulty: 'medium',
-      dateAdded: '2024-01-07',
-      mastered: false,
-      reviewCount: 4,
-      lastReviewed: '2024-12-07'
-    },
-    {
-      id: '10',
-      word: 'collaborate',
-      pronunciation: '/kəˈlæb.ə.reɪt/',
-      meaning: 'hợp tác, cộng tác',
-      examples: [
-        { id: '10-1', sentence: 'We need to collaborate to finish this project.', translation: 'Chúng ta cần hợp tác để hoàn thành dự án này.' }
-      ],
-      category: 'Luyện TOEIC',
-      topic: 'business',
-      difficulty: 'medium',
-      dateAdded: '2024-01-06',
-      mastered: true,
-      reviewCount: 9,
-      lastReviewed: '2024-12-06'
-    }
-  ]);
+  const [vocabularyList, setVocabularyList] = useState<VocabularyItem[]>(getVocabularyList());
 
   const handleDeleteWord = (id: string) => {
-    setVocabularyList(vocabularyList.filter(item => item.id !== id));
+    deleteVocabularyItem(id);
+    setVocabularyList(getVocabularyList());
   };
 
   const handleEditWord = (updatedItem: VocabularyItem) => {
-    setVocabularyList(vocabularyList.map(item => item.id === updatedItem.id ? updatedItem : item));
+    updateVocabularyItem(updatedItem.id, updatedItem);
+    setVocabularyList(getVocabularyList());
     setEditingItem(null);
+  };
+
+  const handleAddWord = (newWord: VocabularyItem) => {
+    addVocabularyItem(newWord);
+    setVocabularyList(getVocabularyList());
   };
 
   const getFilteredAndSortedList = () => {
@@ -306,14 +155,8 @@ export function VocabularyScreen({ onBack }: VocabularyScreenProps) {
   };
 
   const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'Harry Potter': return 'bg-red-100 text-red-800';
-      case 'Luyện TOEIC': return 'bg-green-100 text-green-800';
-      case 'Daily': return 'bg-blue-100 text-blue-800';
-      case 'New': return 'bg-purple-100 text-purple-800';
-      case 'Story': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    const categoryData = getCategories().find(c => c.name === category);
+    return categoryData?.color || 'bg-gray-100 text-gray-800';
   };
 
   const handleSaveWordFromDictionary = (word: string, meaning: string, pronunciation: string, category: string) => {

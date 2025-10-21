@@ -13,26 +13,19 @@ import { Slider } from '../../ui/slider';
 import { DictionarySearchModal } from '../../modal/DictionarySearch/DictionarySearchModal';
 import { TopicSelector } from '../../common/TopicSelector';
 import { DifficultySelector } from '../../common/DifficultySelector';
+import { 
+  getVideoStories, 
+  getStoryCategories, 
+  getVideoStoriesByCategory, 
+  getVideoStoriesByDifficulty,
+  VideoStory,
+  StoryCategory
+} from '../../../lib/story-data';
 
 interface StoryScreenProps {
   onBack: () => void;
 }
 
-interface VideoStory {
-  id: string;
-  title: string;
-  description: string;
-  thumbnail: string;
-  duration: string;
-  topic: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  videoUrl: string; // Mock URL
-  subtitles: SubtitleLine[];
-  relatedWords: VocabularyItem[];
-  views: number;
-  likes: number;
-  isLiked: boolean;
-}
 
 interface SubtitleLine {
   id: string;
@@ -83,186 +76,8 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
   // Category manager modal
   const [showCategoryManager, setShowCategoryManager] = useState(false);
 
-  // Mock video data
-  const [videoStories, setVideoStories] = useState<VideoStory[]>([
-    {
-      id: '1',
-      title: 'Harry Potter - The Philosopher\'s Stone',
-      description: 'Học từ vựng qua câu chuyện về cậu bé phù thủy nổi tiếng',
-      thumbnail: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400',
-      duration: '15:30',
-      topic: 'Harry Potter',
-      difficulty: 'medium',
-      videoUrl: '',
-      views: 12500,
-      likes: 890,
-      isLiked: false,
-      subtitles: [
-        {
-          id: '1',
-          startTime: 0,
-          endTime: 3,
-          text: 'Mr. and Mrs. Dursley of number four, Privet Drive, were proud to say that they were perfectly normal.',
-          translation: 'Ông bà Dursley ở số 4 phố Privet Drive tự hào nói rằng họ hoàn toàn bình thường.',
-          highlightedWords: [
-            { word: 'proud', pronunciation: '/praʊd/', meaning: 'tự hào', startIndex: 65, endIndex: 70 },
-            { word: 'perfectly', pronunciation: '/ˈpɜːr.fɪkt.li/', meaning: 'hoàn hảo', startIndex: 95, endIndex: 104 },
-            { word: 'normal', pronunciation: '/ˈnɔːr.məl/', meaning: 'bình thường', startIndex: 105, endIndex: 111 }
-          ]
-        }
-      ],
-      relatedWords: [
-        {
-          id: '1',
-          word: 'magical',
-          pronunciation: '/ˈmædʒ.ɪ.kəl/',
-          meaning: 'phép thuật',
-          examples: [{ sentence: 'The magical world of Harry Potter fascinated millions.', translation: 'Thế giới phép thuật của Harry Potter đã mê hoặc hàng triệu người.' }],
-          difficulty: 'medium'
-        }
-      ]
-    },
-    {
-      id: '2',
-      title: 'TOEIC Listening Practice',
-      description: 'Luyện nghe TOEIC với các tình huống thực tế',
-      thumbnail: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400',
-      duration: '12:45',
-      topic: 'TOEIC',
-      difficulty: 'hard',
-      videoUrl: '',
-      views: 8750,
-      likes: 651,
-      isLiked: true,
-      subtitles: [
-        {
-          id: '1',
-          startTime: 0,
-          endTime: 4,
-          text: 'Good morning, and welcome to the quarterly business meeting.',
-          translation: 'Chào buổi sáng và chào mừng đến với cuộc họp kinh doanh hàng quý.',
-          highlightedWords: [
-            { word: 'quarterly', pronunciation: '/ˈkwɔːr.tɚ.li/', meaning: 'hàng quý', startIndex: 31, endIndex: 40 }
-          ]
-        }
-      ],
-      relatedWords: [
-        {
-          id: '3',
-          word: 'profit',
-          pronunciation: '/ˈprɑː.fɪt/',
-          meaning: 'lợi nhuận',
-          examples: [{ sentence: 'The company made a significant profit this year.', translation: 'Công ty đã có lợi nhuận đáng kể trong năm nay.' }],
-          difficulty: 'hard'
-        }
-      ]
-    },
-    {
-      id: '3',
-      title: 'Daily English Conversation',
-      description: 'Học từ vựng qua các cuộc trò chuyện hàng ngày',
-      thumbnail: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400',
-      duration: '8:20',
-      topic: 'Daily',
-      difficulty: 'easy',
-      videoUrl: '',
-      views: 15200,
-      likes: 1150,
-      isLiked: false,
-      subtitles: [
-        {
-          id: '1',
-          startTime: 0,
-          endTime: 3,
-          text: 'Hi Sarah, how was your weekend?',
-          translation: 'Chào Sarah, cuối tuần của bạn thế nào?',
-          highlightedWords: [
-            { word: 'weekend', pronunciation: '/ˈwiː.kend/', meaning: 'cuối tuần', startIndex: 20, endIndex: 27 }
-          ]
-        }
-      ],
-      relatedWords: [
-        {
-          id: '4',
-          word: 'fantastic',
-          pronunciation: '/fænˈtæs.tɪk/',
-          meaning: 'tuyệt vời',
-          examples: [{ sentence: 'The weather was fantastic yesterday.', translation: 'Thời tiết hôm qua thật tuyệt vời.' }],
-          difficulty: 'easy'
-        }
-      ]
-    },
-    {
-      id: '4',
-      title: 'Business English Presentation',
-      description: 'Học từ vựng kinh doanh qua các buổi thuyết trình',
-      thumbnail: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=400',
-      duration: '18:15',
-      topic: 'TOEIC',
-      difficulty: 'hard',
-      videoUrl: '',
-      views: 6800,
-      likes: 421,
-      isLiked: true,
-      subtitles: [
-        {
-          id: '1',
-          startTime: 0,
-          endTime: 5,
-          text: 'Today we will discuss our quarterly revenue and future strategies.',
-          translation: 'Hôm nay chúng ta sẽ thảo luận về doanh thu hàng quý và các chiến lược tương lai.',
-          highlightedWords: [
-            { word: 'quarterly', pronunciation: '/ˈkwɔːr.tɚ.li/', meaning: 'hàng quý', startIndex: 30, endIndex: 39 }
-          ]
-        }
-      ],
-      relatedWords: [
-        {
-          id: '5',
-          word: 'analysis',
-          pronunciation: '/əˈnæl.ə.sɪs/',
-          meaning: 'phân tích',
-          examples: [{ sentence: 'The market analysis shows positive trends.', translation: 'Phân tích thị trường cho thấy xu hướng tích cực.' }],
-          difficulty: 'hard'
-        }
-      ]
-    },
-    {
-      id: '5',
-      title: 'Travel English Phrases',
-      description: 'Từ vựng hữu ích cho chuyến du lịch',
-      thumbnail: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400',
-      duration: '10:30',
-      topic: 'Daily',
-      difficulty: 'easy',
-      videoUrl: '',
-      views: 22100,
-      likes: 1680,
-      isLiked: false,
-      subtitles: [
-        {
-          id: '1',
-          startTime: 0,
-          endTime: 4,
-          text: 'Excuse me, could you help me find the nearest subway station?',
-          translation: 'Xin lỗi, bạn có thể giúp tôi tìm ga tàu điện ngầm gần nhất không?',
-          highlightedWords: [
-            { word: 'nearest', pronunciation: '/ˈnɪr.ɪst/', meaning: 'gần nhất', startIndex: 42, endIndex: 49 }
-          ]
-        }
-      ],
-      relatedWords: [
-        {
-          id: '6',
-          word: 'destination',
-          pronunciation: '/ˌdes.tɪˈneɪ.ʃən/',
-          meaning: 'điểm đến',
-          examples: [{ sentence: 'Paris is my favorite travel destination.', translation: 'Paris là điểm đến du lịch yêu thích của tôi.' }],
-          difficulty: 'medium'
-        }
-      ]
-    }
-  ]);
+  // Get video data from story-data.ts
+  const [videoStories, setVideoStories] = useState<VideoStory[]>(getVideoStories());
 
   const getFilteredVideos = () => {
     return videoStories.filter(video => 
@@ -272,9 +87,21 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
 
   const getCurrentSubtitle = () => {
     if (!selectedVideo) return null;
-    return selectedVideo.subtitles.find(subtitle => 
-      currentTime >= subtitle.startTime && currentTime <= subtitle.endTime
-    );
+    // For now, return the first word as subtitle since story-data.ts uses words instead of subtitles
+    return selectedVideo.words.length > 0 ? {
+      id: '1',
+      startTime: 0,
+      endTime: 3,
+      text: selectedVideo.words[0].word,
+      translation: selectedVideo.words[0].meaning,
+      highlightedWords: [{
+        word: selectedVideo.words[0].word,
+        pronunciation: selectedVideo.words[0].pronunciation,
+        meaning: selectedVideo.words[0].meaning,
+        startIndex: 0,
+        endIndex: selectedVideo.words[0].word.length - 1
+      }]
+    } : null;
   };
 
   const togglePlayPause = () => {
@@ -367,7 +194,7 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
 
   // Mock video progress
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+     let interval: number;
     if (isPlaying && selectedVideo) {
       interval = setInterval(() => {
         setCurrentTime(prev => {
@@ -392,12 +219,8 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
   };
 
   const getTopicColor = (topic: string) => {
-    switch (topic) {
-      case 'Harry Potter': return 'bg-red-100 text-red-800';
-      case 'TOEIC': return 'bg-green-100 text-green-800';
-      case 'Daily': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    const topicData = getStoryCategories().find(t => t.name === topic);
+    return topicData?.color || 'bg-gray-100 text-gray-800';
   };
 
   // Handle saving word from dictionary popup
@@ -412,11 +235,11 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
     <Card key={video.id} className="hover:shadow-lg transition-shadow">
       <CardContent className="p-0">
         <div className="relative">
-          <ImageWithFallback
-            src={video.thumbnail}
-            alt={video.title}
-            className="w-full h-48 object-cover rounded-t-lg"
-          />
+           <ImageWithFallback
+             src={video.thumbnailUrl}
+             alt={video.title}
+             className="w-full h-48 object-cover rounded-t-lg"
+           />
           
           {/* Play button */}
           <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
@@ -433,10 +256,10 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
             </Button>
           </div>
           
-          {/* Duration badge */}
-          <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-sm">
-            {video.duration}
-          </div>
+           {/* Duration badge */}
+           <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-sm">
+             {Math.floor(video.duration / 60)}:{(video.duration % 60).toString().padStart(2, '0')}
+           </div>
           
           {/* Selection checkbox */}
           <div className="absolute top-2 left-2">
@@ -455,9 +278,9 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
               onClick={() => toggleFavorite(video.id)}
               className="bg-white/80 hover:bg-white/90 h-8 w-8 p-0"
             >
-              <Heart 
-                className={`h-4 w-4 ${video.isLiked ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} 
-              />
+               <Heart 
+                 className={`h-4 w-4 ${favoriteVideos.includes(video.id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} 
+               />
             </Button>
           </div>
         </div>
@@ -482,16 +305,16 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
             </div>
             
             {/* Views and likes */}
-            <div className="flex items-center space-x-3 text-sm text-muted-foreground">
-              <div className="flex items-center space-x-1">
-                <Users className="h-3 w-3" />
-                <span>{formatViews(video.views)}</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <Heart className="h-3 w-3" />
-                <span>{video.likes}</span>
-              </div>
-            </div>
+             <div className="flex items-center space-x-3 text-sm text-muted-foreground">
+               <div className="flex items-center space-x-1">
+                 <Users className="h-3 w-3" />
+                 <span>{formatViews(video.viewCount)}</span>
+               </div>
+               <div className="flex items-center space-x-1">
+                 <Heart className="h-3 w-3" />
+                 <span>{favoriteVideos.includes(video.id) ? '❤️' : '🤍'}</span>
+               </div>
+             </div>
           </div>
         </div>
       </CardContent>
@@ -521,9 +344,9 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
             </div>
             <div className="flex-1">
               <h1 className="text-xl">{selectedVideo.title}</h1>
-              <p className="text-red-100 text-sm">
-                {Math.floor(currentTime / 60)}:{(currentTime % 60).toString().padStart(2, '0')} / {selectedVideo.duration}
-              </p>
+               <p className="text-red-100 text-sm">
+                 {Math.floor(currentTime / 60)}:{(currentTime % 60).toString().padStart(2, '0')} / {Math.floor(selectedVideo.duration / 60)}:{(selectedVideo.duration % 60).toString().padStart(2, '0')}
+               </p>
             </div>
             <div className="flex space-x-2">
               <Button
@@ -551,11 +374,11 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
           <Card>
             <CardContent className="p-0">
               <div className="aspect-video bg-black rounded-lg flex items-center justify-center relative overflow-hidden">
-                <ImageWithFallback
-                  src={selectedVideo.thumbnail}
-                  alt={selectedVideo.title}
-                  className="w-full h-full object-cover"
-                />
+                 <ImageWithFallback
+                   src={selectedVideo.thumbnailUrl}
+                   alt={selectedVideo.title}
+                   className="w-full h-full object-cover"
+                 />
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                   <Button
                     size="lg"
@@ -710,14 +533,14 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
             </Card>
           )}
 
-          {/* Related Words */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Từ vựng liên quan</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {selectedVideo.relatedWords.map((word) => (
+           {/* Related Words */}
+           <Card>
+             <CardHeader>
+               <CardTitle>Từ vựng liên quan</CardTitle>
+             </CardHeader>
+             <CardContent>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 {selectedVideo.words.map((word) => (
                   <div key={word.id} className="p-4 border rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-semibold">{word.word}</h4>
@@ -925,7 +748,7 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
         isOpen={showDictionaryPopup}
         onClose={() => setShowDictionaryPopup(false)}
         onSaveWord={handleSaveWordFromDictionary}
-        categories={['Harry Potter', 'TOEIC', 'Daily']}
+        categories={getStoryCategories().map(c => c.name)}
       />
       {/* Category Manager Modal */}
       <CategoryManagerModal

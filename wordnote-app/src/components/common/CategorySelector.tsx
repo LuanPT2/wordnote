@@ -7,6 +7,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { ChevronDown, ChevronRight, Folder, FolderOpen, FileText } from 'lucide-react';
 import { vocabularyLibrary } from '../../lib/vocabulary-library';
 import { Category } from '../../lib/vocabulary-types';
+import { getCategories } from '../../lib/vocabulary-data';
 
 interface CategoryNode extends Category {
   children: CategoryNode[];                   
@@ -44,7 +45,7 @@ export function CategorySelector({
 
   const loadCategories = async () => {
     try {
-      const data = await vocabularyLibrary.getCategories();
+      const data = getCategories();
       setCategories(data);
       setCategoryTree(buildCategoryTree(data));
     } catch (error) {
