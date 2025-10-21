@@ -63,7 +63,7 @@ export function BulkAddDialog({ categories, setVocabularyList, setCategories }: 
           Thêm nhiều
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl bg-white shadow-2xl">
         <DialogHeader>
           <DialogTitle>Thêm nhiều từ vựng</DialogTitle>
           <DialogDescription>

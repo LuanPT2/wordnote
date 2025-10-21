@@ -9,6 +9,8 @@ import { CategoryManagerModal } from '../../modal/CategoryModal/CategoryManagerM
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
 import { Progress } from '../../ui/progress';
 import { DictionarySearchModal } from '../../modal/DictionarySearch/DictionarySearchModal';
+import { TopicSelector } from '../../common/TopicSelector';
+import { DifficultySelector } from '../../common/DifficultySelector';
 
 interface FreeStudyScreenProps {
   onBack: () => void;
@@ -51,8 +53,8 @@ export function FreeStudyScreen({ onBack }: FreeStudyScreenProps) {
   const [selectedTopic, setSelectedTopic] = useState<StudyTopic | null>(null);
   const [selectedSubTopic, setSelectedSubTopic] = useState<StudySubTopic | null>(null);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [filterCategory, setFilterCategory] = useState('all');
-  const [filterDifficulty, setFilterDifficulty] = useState('all');
+  const [filterCategory, setFilterCategory] = useState('general');
+  const [filterDifficulty, setFilterDifficulty] = useState('easy');
 
   // Dictionary popup state
   const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
@@ -229,12 +231,9 @@ export function FreeStudyScreen({ onBack }: FreeStudyScreenProps) {
     }
   ];
 
-  const categories = ['all', 'Nature', 'Food', 'Transportation', 'Career'];
-
   const getFilteredTopics = () => {
     return studyTopics.filter(topic => 
-      (filterCategory === 'all' || topic.category === filterCategory) &&
-      (filterDifficulty === 'all' || topic.difficulty === filterDifficulty)
+      topic.difficulty === filterDifficulty
     );
   };
 
@@ -665,35 +664,15 @@ export function FreeStudyScreen({ onBack }: FreeStudyScreenProps) {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm mb-2">Danh mục</label>
-                <Select value={filterCategory} onValueChange={setFilterCategory}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tất cả danh mục</SelectItem>
-                    {categories.filter(c => c !== 'all').map((category) => (
-                      <SelectItem key={category} value={category}>{category}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <TopicSelector 
+                value={filterCategory} 
+                onChange={setFilterCategory}
+              />
               
-              <div>
-                <label className="block text-sm mb-2">Độ khó</label>
-                <Select value={filterDifficulty} onValueChange={setFilterDifficulty}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tất cả độ khó</SelectItem>
-                    <SelectItem value="easy">Dễ</SelectItem>
-                    <SelectItem value="medium">Trung bình</SelectItem>
-                    <SelectItem value="hard">Khó</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <DifficultySelector 
+                value={filterDifficulty as 'easy' | 'medium' | 'hard'} 
+                onChange={setFilterDifficulty}
+              />
             </div>
           </CardContent>
         </Card>

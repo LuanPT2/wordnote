@@ -11,6 +11,8 @@ import { ImageWithFallback } from '../../figma/ImageWithFallback';
 import { Progress } from '../../ui/progress';
 import { Slider } from '../../ui/slider';
 import { DictionarySearchModal } from '../../modal/DictionarySearch/DictionarySearchModal';
+import { TopicSelector } from '../../common/TopicSelector';
+import { DifficultySelector } from '../../common/DifficultySelector';
 
 interface StoryScreenProps {
   onBack: () => void;
@@ -73,8 +75,8 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
   const [selectedWordInfo, setSelectedWordInfo] = useState<HighlightedWord | null>(null);
 
   // Filters
-  const [filterTopic, setFilterTopic] = useState('all');
-  const [filterDifficulty, setFilterDifficulty] = useState('all');
+  const [filterTopic, setFilterTopic] = useState('general');
+  const [filterDifficulty, setFilterDifficulty] = useState('easy');
 
   // Dictionary popup state
   const [showDictionaryPopup, setShowDictionaryPopup] = useState(false);
@@ -262,13 +264,9 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
     }
   ]);
 
-  const topics = ['all', 'Harry Potter', 'TOEIC', 'Daily'];
-  const difficulties = ['all', 'easy', 'medium', 'hard'];
-
   const getFilteredVideos = () => {
     return videoStories.filter(video => 
-      (filterTopic === 'all' || video.topic === filterTopic) &&
-      (filterDifficulty === 'all' || video.difficulty === filterDifficulty)
+      video.difficulty === filterDifficulty
     );
   };
 
@@ -831,35 +829,15 @@ export function StoryScreen({ onBack }: StoryScreenProps) {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm mb-2">Chủ đề</label>
-                    <Select value={filterTopic} onValueChange={setFilterTopic}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Tất cả chủ đề</SelectItem>
-                        {topics.filter(t => t !== 'all').map((topic) => (
-                          <SelectItem key={topic} value={topic}>{topic}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <TopicSelector 
+                    value={filterTopic} 
+                    onChange={setFilterTopic}
+                  />
                   
-                  <div>
-                    <label className="block text-sm mb-2">Độ khó</label>
-                    <Select value={filterDifficulty} onValueChange={setFilterDifficulty}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Tất cả độ khó</SelectItem>
-                        <SelectItem value="easy">Dễ</SelectItem>
-                        <SelectItem value="medium">Trung bình</SelectItem>
-                        <SelectItem value="hard">Khó</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <DifficultySelector 
+                    value={filterDifficulty as 'easy' | 'medium' | 'hard'} 
+                    onChange={setFilterDifficulty}
+                  />
                 </div>
               </CardContent>
             </Card>
